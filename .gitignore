@@ -1,0 +1,4 @@
+env.sh
+*.gzip
+frontend/public/js/
+frontend/node_modules/*
