@@ -42,7 +42,6 @@ then find apigateway url with:
 git clone https://github.com/nathants/new-gocljs
 cd new-gocljs
 cp env.sh.template env.sh # update values
-source env.sh             # populate env
 bash bin/check.sh         # lint
 bash bin/deploy.sh        # ensure aws infra and deploy prod release
 bash bin/dev.sh           # rapidly iterate by updating lambda zip
