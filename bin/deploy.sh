@@ -8,6 +8,7 @@ source env.sh
 (
     cd frontend
     npm ci
+    rm -rf public/js/
     npx shadow-cljs release app
 ) 2>&1 | sed 's/^/shadow-cljs: /'
 
