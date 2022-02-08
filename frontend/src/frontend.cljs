@@ -147,15 +147,6 @@
      [component-help]
      [component-main])])
 
-(def router
-  [["/" component-home]
-   ["/home" component-home]
-   ["/files" component-files]
-   ["/search" component-search]
-   ["/search/(.*)" component-search]
-   ["/dms" component-dms]
-   ["(.*)" component-not-found]])
-
 (defn mousedown-listener [e]
   nil)
 
@@ -213,8 +204,17 @@
       (.addEventListener js/document name f)
       (swap! state assoc key true))))
 
+(def router
+  [["/" component-home]
+   ["/home" component-home]
+   ["/files" component-files]
+   ["/search" component-search]
+   ["/search/(.*)" component-search]
+   ["/dms" component-dms]
+   ["(.*)" component-not-found]])
+
 (defn start-router []
-  (bide/start! (bide/router router) {:default home
+  (bide/start! (bide/router router) {:default "/"
                                      :on-navigate on-navigate
                                      :html5? false}))
 
