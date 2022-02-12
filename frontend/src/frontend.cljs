@@ -76,8 +76,7 @@
   [:<>
    (for [line (remove s/blank? (s/split (:search-text @state) #"/"))]
      ^{:key (gen-id)} [card card-style
-                       [typography line]])
-   ])
+                       [typography line]])])
 
 (defn component-dms []
   [card card-style
@@ -195,7 +194,8 @@
 
 (defn on-navigate [component data]
   (when (= component-search component)
-    (swap! state assoc :search-text (js/decodeURIComponent (:0 data))))
+    (when-let [val (:0 data)]
+      (swap! state assoc :search-text (js/decodeURIComponent val))))
   (swap! state merge {:page component :parts (href-parts)}))
 
 (defn document-listener [name f]
