@@ -44,16 +44,9 @@ cd new-gocljs
 cp env.sh.template env.sh # update values
 bash bin/check.sh         # lint
 bash bin/deploy.sh        # ensure aws infra and deploy prod release
-bash bin/dev.sh           # rapidly iterate by updating lambda zip
+bash bin/dev.sh           # rapidly iterate by updating the lambda zip
+bash bin/logs.sh          # tail the logs
 bash bin/delete.sh        # delete
 ```
 
 ## [demo](https://gocljs.nathants.com)
-
-### deploy
-
-### deploy
-
-### dev
-
-### delete
