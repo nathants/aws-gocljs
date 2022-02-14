@@ -4,7 +4,7 @@
 // attr: timeout 60
 //
 // dynamodb: ${PROJECT_NAME} id:s:hash
-// s3: ${PROJECT_BUCKET} cors=true acl=private
+// s3: ${PROJECT_BUCKET} cors=true acl=private ttldays=14
 //
 // trigger: api dns=${PROJECT_DOMAIN}
 // trigger: cloudwatch rate(5 minutes)
