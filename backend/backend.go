@@ -182,7 +182,7 @@ func setupLogging(ctx context.Context) {
 			if len(lines) == 0 {
 				return
 			}
-			text := strings.Join(lines, "\n")
+			text := strings.Join(lines, "")
 			lines = nil
 			unix := time.Now().Unix()
 			key := fmt.Sprintf("logs/%d.%s.%03d", unix, uid, count)
