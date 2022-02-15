@@ -128,6 +128,7 @@
                   :ref #(reset! search-ref %)
                   :id "search"
                   :autoComplete "off"
+                  :spellCheck false
                   :multiline false
                   :fullWidth true
                   :focused (:search-focus @state)
