@@ -16,6 +16,7 @@ a template for a project with:
 ## dependencies
 
 - npm
+- jdk
 - go
 - bash
 - [entr](https://formulae.brew.sh/formula/entr)
