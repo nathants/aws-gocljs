@@ -111,9 +111,7 @@
      [:li "h : home"]
      [:li "f : files"]
      [:li "d : dms"]
-     [:li "/ : search"
-      [:ul {:style {:padding-left "23px"}}
-       [:li "c-h : clear search text"]]]]]])
+     [:li "/ : search"]]]])
 
 (def search-ref (atom nil))
 
