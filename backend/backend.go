@@ -1,4 +1,5 @@
 //
+// attr: name ${PROJECT_NAME}
 // attr: concurrency 0
 // attr: memory 128
 // attr: timeout 60
@@ -13,9 +14,8 @@
 // allow: dynamodb:* arn:aws:dynamodb:*:*:table/${PROJECT_NAME}
 // allow: s3:* arn:aws:s3:::${PROJECT_BUCKET}/*
 //
-// include: ../frontend/public/js/
-// include: ../frontend/public/index.*
-// include: ../frontend/public/favicon.*
+// include: ../frontend/public/index.html.gzip
+// include: ../frontend/public/favicon.png
 //
 
 package main
@@ -25,9 +25,11 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime"
+	"net/http"
 	"os"
 	"runtime/debug"
 	"strings"
@@ -42,6 +44,14 @@ import (
 	"github.com/nathants/cli-aws/lib"
 	uuid "github.com/satori/go.uuid"
 )
+
+func corsHeaders() map[string]string {
+	return map[string]string{
+		"Access-Control-Allow-Origin":  "*",
+		"Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
+		"Access-Control-Allow-Headers": "auth, content-type",
+	}
+}
 
 func index() events.APIGatewayProxyResponse {
 	headers := map[string]string{
@@ -110,13 +120,50 @@ func notfound() events.APIGatewayProxyResponse {
 	}
 }
 
-func handleApiEvent(_ context.Context, event *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
+func handleApiEvent(ctx context.Context, event *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
 	if strings.HasPrefix(event.Path, "/js/main.js") ||
 		strings.HasPrefix(event.Path, "/favicon.") {
 		res <- static(event.Path)
 		return
 	}
+	if strings.HasPrefix(event.Path, "/api/") {
+		if event.HTTPMethod == http.MethodOptions {
+			res <- events.APIGatewayProxyResponse{
+				StatusCode: 200,
+				Headers:    corsHeaders(),
+			}
+			return
+		}
+		switch event.Path {
+		case "/api/time":
+			switch event.HTTPMethod {
+			case http.MethodGet:
+				httpTimeGet(ctx, event, res)
+				return
+			}
+		default:
+		}
+	}
 	res <- index()
+}
+
+type timeGetReponse struct {
+	Time int `json:"time"`
+}
+
+func httpTimeGet(_ context.Context, event *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
+	resp := timeGetReponse{
+		Time: int(time.Now().UTC().Unix()),
+	}
+	data, err := json.Marshal(resp)
+	if err != nil {
+		panic(err)
+	}
+	res <- events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers:    corsHeaders(),
+		Body:       string(data),
+	}
 }
 
 func logRecover(r interface{}, res chan<- events.APIGatewayProxyResponse) {
@@ -158,9 +205,10 @@ func handleRequest(ctx context.Context, event map[string]interface{}) (events.AP
 	path, ok := event["path"]
 	ts := time.Now().UTC().Format(time.RFC3339)
 	if ok {
-		lib.Logger.Println(r.StatusCode, path, time.Since(start), ts)
+		ip := event["requestContext"].(map[string]interface{})["identity"].(map[string]interface{})["sourceIp"].(string)
+		lib.Logger.Println("http", r.StatusCode, path, time.Since(start), ip, ts)
 	} else {
-		lib.Logger.Println(fmt.Sprintf("%#v", event), time.Since(start), ts)
+		lib.Logger.Println("async", time.Since(start), ts)
 	}
 	return r, nil
 }

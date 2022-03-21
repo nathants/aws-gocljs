@@ -14,22 +14,37 @@
             [reagent-mui.material.text-field :refer [text-field]]
             [reagent-mui.material.container :refer [container]]
             [reagent-mui.material.grid :refer [grid]]
+            [reagent-mui.material.linear-progress :refer [linear-progress]]
             [reagent-mui.material.icon-button :refer [icon-button]]
             [reagent-mui.material.toolbar :refer [toolbar]]
             [reagent-mui.material.typography :refer [typography]]
             [reagent-mui.icons.home :refer [home]]
             [reagent-mui.icons.sms :refer [sms]]
+            [reagent-mui.icons.access-time :refer [access-time]]
             [reagent-mui.icons.folder :refer [folder]]))
 
-(defn log [& args] (apply js/console.log (map clj->js args)))
-(defn event-key ^str [^js/KeyboardEvent e] (.-key e))
-(defn focus [^js/Object e] (.focus e))
-(defn query-selector ^js/Object [^js/Object e ^str q] (.querySelector e q))
-(defn blur-active [] (.blur (.-activeElement js/document)))
-(defn target-value [^js/Event e] (.-value (.-target e)))
-(defn prevent-default [^js/Event e] (.preventDefault e))
-
 (set! *warn-on-infer* true)
+
+(defn log [& args]
+  (apply js/console.log (map clj->js args)))
+
+(defn event-key ^str [^js/KeyboardEvent e]
+  (.-key e))
+
+(defn focus [^js/Object e]
+  (.focus e))
+
+(defn query-selector ^js/Object [^js/Object e ^str q]
+  (.querySelector e q))
+
+(defn blur-active []
+  (.blur (.-activeElement js/document)))
+
+(defn target-value [^js/Event e]
+  (.-value (.-target e)))
+
+(defn prevent-default [^js/Event e]
+  (.preventDefault e))
 
 (let [id (atom 0)
       -gen-id (memoize
@@ -47,7 +62,8 @@
     :key-listener false
     :mouse-listener false
     :search-text ""
-    :page home}))
+    :page home
+    :time nil}))
 
 (def style
   (garden/css
@@ -63,6 +79,45 @@
   {:style {:padding "20px"
            :margin-bottom "10px"}
    :class "bg-color"})
+
+(goog-define domain "")
+
+(def api-url (str "https://" domain))
+
+(def max-retries 7)
+
+(defn api-delete [route json-params]
+  (go-loop [i 0]
+    (let [resp (<! (http/delete (str api-url route)
+                                {:json-params json-params
+                                 :with-credentials? false}))]
+      (cond
+        (= 200 (:status resp)) resp
+        (< i max-retries) (do (<! (a/timeout (* i 100)))
+                              (recur (inc i)))
+        :else (throw "failed after several tries")))))
+
+(defn api-post [route json-params]
+  (go-loop [i 0]
+    (let [resp (<! (http/post (str api-url route)
+                              {:json-params json-params
+                               :with-credentials? false}))]
+      (cond
+        (= 200 (:status resp)) resp
+        (< i max-retries) (do (<! (a/timeout (* i 100)))
+                              (recur (inc i)))
+        :else (throw "failed after several tries")))))
+
+(defn api-get [route query-params]
+  (go-loop [i 0]
+    (let [resp (<! (http/get (str api-url route)
+                             {:query-params query-params
+                              :with-credentials? false}))]
+      (cond
+        (= 200 (:status resp)) resp
+        (< i max-retries) (do (<! (a/timeout (* i 100)))
+                              (recur (inc i)))
+        :else (throw "failed after several tries")))))
 
 (defn component-home []
   [card card-style
@@ -81,6 +136,15 @@
 (defn component-dms []
   [card card-style
    [typography "dms"]])
+
+(defn component-time []
+  (if (nil? (:time @state))
+    (do (go (let [resp (<! (api-get "/api/time" {}))]
+              (swap! state assoc :time (:time (:body resp)))))
+        [card card-style
+         [linear-progress {:style {:height "13px" :margin "2px"}}]])
+    [card card-style
+     [typography (str "time: " (:time @state))]]))
 
 (defn component-not-found []
   [:div
@@ -122,6 +186,7 @@
      [component-menu-button "home" component-home  home]
      [component-menu-button "files" component-files  folder]
      [component-menu-button "dms" component-dms sms]
+     [component-menu-button "time" component-time access-time]
      [text-field {:placeholder "search"
                   :ref #(reset! search-ref %)
                   :id "search"
@@ -210,6 +275,7 @@
    ["/search" component-search]
    ["/search/(.*)" component-search]
    ["/dms" component-dms]
+   ["/time" component-time]
    ["(.*)" component-not-found]])
 
 (defn start-router []
