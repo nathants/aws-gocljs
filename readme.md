@@ -6,6 +6,8 @@ web dev should be easier.
 
 ## what
 
+demo: https://gocljs.nathants.com
+
 a template for a project with:
  - go backend on lambda with s3 and dynamodb
  - cljs frontend with reagent
@@ -49,5 +51,3 @@ bash bin/dev.sh           # rapidly iterate on lambda backend and localhost:8000
 bash bin/logs.sh          # tail the logs
 bash bin/delete.sh        # delete
 ```
-
-## [demo](https://gocljs.nathants.com)
