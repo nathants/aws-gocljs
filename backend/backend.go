@@ -24,7 +24,9 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -40,6 +42,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/dustin/go-humanize"
 	"github.com/mitchellh/mapstructure"
 	"github.com/nathants/cli-aws/lib"
 	uuid "github.com/satori/go.uuid"
@@ -120,7 +123,37 @@ func notfound() events.APIGatewayProxyResponse {
 	}
 }
 
+func fileInfo(file string) map[string]string {
+	info, err := os.Stat(file)
+	if err != nil {
+		panic(err)
+	}
+	data, err := ioutil.ReadFile(file)
+	if err != nil {
+		panic(err)
+	}
+	hash := sha256.Sum256(data)
+	return map[string]string{
+		"sha256": hex.EncodeToString(hash[:]),
+		"size":   humanize.Bytes(uint64(info.Size())),
+	}
+}
+
 func handleApiEvent(ctx context.Context, event *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
+	if event.Path == "/_version" {
+		data, err := json.Marshal(map[string]map[string]string{
+			"backend":  fileInfo("main"),
+			"frontend": fileInfo("frontend/public/index.html.gzip"),
+		})
+		if err != nil {
+			panic(err)
+		}
+		res <- events.APIGatewayProxyResponse{
+			StatusCode: 200,
+			Body:       string(data),
+		}
+		return
+	}
 	if strings.HasPrefix(event.Path, "/js/main.js") ||
 		strings.HasPrefix(event.Path, "/favicon.") {
 		res <- static(event.Path)

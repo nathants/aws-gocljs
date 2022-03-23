@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/aws/aws-lambda-go v1.28.0
 	github.com/aws/aws-sdk-go v1.42.52
+	github.com/dustin/go-humanize v1.0.0
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/nathants/cli-aws v0.0.0-20220212081758-4e337cd3eb73
 	github.com/satori/go.uuid v1.2.0
