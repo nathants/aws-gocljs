@@ -152,6 +152,7 @@
 
 (defn component-menu-button [page-name page-component icon]
   [icon-button {:id page-name
+                :disable-ripple true
                 :class "menu-button"
                 :href (str "#/" page-name)
                 :style  (merge {:padding "15px"}
