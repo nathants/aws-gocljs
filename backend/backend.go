@@ -140,6 +140,10 @@ func fileInfo(file string) map[string]string {
 }
 
 func handleApiEvent(ctx context.Context, event *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
+	if event.Path == "/" {
+		res <- index()
+		return
+	}
 	if event.Path == "/_version" {
 		data, err := json.Marshal(map[string]map[string]string{
 			"backend":  fileInfo("main"),
@@ -176,8 +180,10 @@ func handleApiEvent(ctx context.Context, event *events.APIGatewayProxyRequest, r
 			}
 		default:
 		}
+		res <- notfound()
+		return
 	}
-	res <- index()
+	res <- notfound()
 }
 
 type timeGetReponse struct {
