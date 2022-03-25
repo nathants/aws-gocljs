@@ -80,7 +80,7 @@
            :margin-bottom "10px"}
    :class "bg-color"})
 
-(goog-define domain "")
+(goog-define domain "") ;; defined via environment variable PROJECT_DOMAIN
 
 (def api-url (str "https://" domain))
 
