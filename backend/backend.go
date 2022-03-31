@@ -43,9 +43,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/dustin/go-humanize"
+	uuid "github.com/gofrs/uuid"
 	"github.com/mitchellh/mapstructure"
 	"github.com/nathants/cli-aws/lib"
-	uuid "github.com/satori/go.uuid"
 )
 
 func corsHeaders() map[string]string {
@@ -190,7 +190,7 @@ type timeGetReponse struct {
 	Time int `json:"time"`
 }
 
-func httpTimeGet(_ context.Context, event *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
+func httpTimeGet(_ context.Context, _ *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
 	resp := timeGetReponse{
 		Time: int(time.Now().UTC().Unix()),
 	}
@@ -255,7 +255,7 @@ func handleRequest(ctx context.Context, event map[string]interface{}) (events.AP
 func setupLogging(ctx context.Context) {
 	lock := sync.RWMutex{}
 	var lines []string
-	uid := uuid.NewV4().String()
+	uid := uuid.Must(uuid.NewV4()).String()
 	count := 0
 	lib.Logger = &lib.LoggerStruct{
 		Print: func(args ...interface{}) {
