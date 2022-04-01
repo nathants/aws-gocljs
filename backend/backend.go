@@ -223,6 +223,7 @@ func logRecover(r interface{}, res chan<- events.APIGatewayProxyResponse) {
 	res <- events.APIGatewayProxyResponse{
 		StatusCode: 500,
 		Body:       fmt.Sprint(r) + "\n" + stack,
+		Headers:    corsHeaders(),
 	}
 }
 
