@@ -1,7 +1,6 @@
 (ns frontend
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require ["libsodium-wrappers" :as sodium]
-            [cljs-http.client :as http]
+  (:require [cljs-http.client :as http]
             [cljs.core.async :refer [<! >! chan timeout] :as a]
             [cljs.pprint]
             [reagent.dom :as reagent.dom]
