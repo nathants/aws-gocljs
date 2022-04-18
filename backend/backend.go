@@ -45,7 +45,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/dustin/go-humanize"
 	uuid "github.com/gofrs/uuid"
-	"github.com/mitchellh/mapstructure"
 	"github.com/nathants/cli-aws/lib"
 )
 
@@ -239,7 +238,11 @@ func handle(ctx context.Context, event map[string]interface{}, res chan<- events
 		return
 	}
 	apiEvent := &events.APIGatewayProxyRequest{}
-	err := mapstructure.Decode(event, apiEvent)
+	data, err := json.Marshal(event)
+	if err != nil {
+	    panic(err)
+	}
+	err = json.Unmarshal(data, &apiEvent)
 	if err != nil {
 		panic(err)
 	}
