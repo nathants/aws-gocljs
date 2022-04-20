@@ -79,15 +79,11 @@
            :margin-bottom "10px"}
    :class "bg-color"})
 
-(goog-define domain "") ;; defined via environment variable PROJECT_DOMAIN
-
-(def api-url (str "https://" domain))
-
 (def max-retries 7)
 
 (defn api-delete [route json-params]
   (go-loop [i 0]
-    (let [resp (<! (http/delete (str api-url route)
+    (let [resp (<! (http/delete route
                                 {:json-params json-params
                                  :with-credentials? false}))]
       (cond
@@ -98,7 +94,7 @@
 
 (defn api-post [route json-params]
   (go-loop [i 0]
-    (let [resp (<! (http/post (str api-url route)
+    (let [resp (<! (http/post route
                               {:json-params json-params
                                :with-credentials? false}))]
       (cond
@@ -109,7 +105,7 @@
 
 (defn api-get [route query-params]
   (go-loop [i 0]
-    (let [resp (<! (http/get (str api-url route)
+    (let [resp (<! (http/get route
                              {:query-params query-params
                               :with-credentials? false}))]
       (cond
