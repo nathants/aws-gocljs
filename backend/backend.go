@@ -48,14 +48,6 @@ import (
 	"github.com/nathants/cli-aws/lib"
 )
 
-func corsHeaders() map[string]string {
-	return map[string]string{
-		"Access-Control-Allow-Origin":  "*",
-		"Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
-		"Access-Control-Allow-Headers": "auth, content-type",
-	}
-}
-
 func index() events.APIGatewayProxyResponse {
 	headers := map[string]string{
 		"Content-Type": "text/html; charset=UTF-8",
@@ -177,7 +169,6 @@ func handleApiEvent(ctx context.Context, event *events.APIGatewayProxyRequest, r
 		if event.HTTPMethod == http.MethodOptions {
 			res <- events.APIGatewayProxyResponse{
 				StatusCode: 200,
-				Headers:    corsHeaders(),
 			}
 			return
 		}
@@ -210,7 +201,6 @@ func httpTimeGet(_ context.Context, _ *events.APIGatewayProxyRequest, res chan<-
 	}
 	res <- events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Headers:    corsHeaders(),
 		Body:       string(data),
 	}
 }
@@ -222,7 +212,6 @@ func logRecover(r interface{}, res chan<- events.APIGatewayProxyResponse) {
 	res <- events.APIGatewayProxyResponse{
 		StatusCode: 500,
 		Body:       fmt.Sprint(r) + "\n" + stack,
-		Headers:    corsHeaders(),
 	}
 }
 
