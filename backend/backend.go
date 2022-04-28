@@ -2,17 +2,20 @@
 // attr: name ${PROJECT_NAME}
 // attr: concurrency 0
 // attr: memory 128
-// attr: timeout 60
+// attr: timeout 900
 //
 // dynamodb: ${PROJECT_NAME} id:s:hash
 // s3: ${PROJECT_BUCKET} cors=true acl=private ttldays=14
 //
 // trigger: api dns=${PROJECT_DOMAIN}
+// trigger: websocket dns=${PROJECT_DOMAIN_WEBSOCKET}
 // trigger: cloudwatch rate(5 minutes)
 //
 // policy: AWSLambdaBasicExecutionRole
-// allow: dynamodb:* arn:aws:dynamodb:*:*:table/${PROJECT_NAME}
+// allow: dynamodb:* arn:aws:dynamodb:${AWS_DEFAULT_REGION}:*:table/${PROJECT_NAME}
 // allow: s3:* arn:aws:s3:::${PROJECT_BUCKET}/*
+// allow: execute-api:ManageConnections arn:aws:execute-api:${AWS_DEFAULT_REGION}:*:${WEBSOCKET_ID}/*/*/*
+// allow: lambda:InvokeFunction arn:aws:lambda:*:*:function:${PROJECT_NAME}
 //
 // include: ../frontend/public/index.html.gzip
 // include: ../frontend/public/favicon.png
@@ -42,11 +45,29 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	sdkLambda "github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/dustin/go-humanize"
 	uuid "github.com/gofrs/uuid"
 	"github.com/nathants/cli-aws/lib"
+	"github.com/nathants/go-dynamolock"
 )
+
+type WebsocketKey struct {
+	ID string `json:"id"`
+}
+
+type WebsocketData struct {
+	ConnectionID string `json:"connection-id"`
+	Timestamp    string `json:"timestamp"`
+}
+
+type Websocket struct {
+	WebsocketKey
+	WebsocketData
+}
 
 func index() events.APIGatewayProxyResponse {
 	headers := map[string]string{
@@ -202,6 +223,7 @@ func httpTimeGet(_ context.Context, _ *events.APIGatewayProxyRequest, res chan<-
 	res <- events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       string(data),
+		Headers:    map[string]string{"Content-Type": "application/json"},
 	}
 }
 
@@ -215,12 +237,248 @@ func logRecover(r interface{}, res chan<- events.APIGatewayProxyResponse) {
 	}
 }
 
+func handleWebsocketEvent(ctx context.Context, event *events.APIGatewayWebsocketProxyRequest, res chan<- events.APIGatewayProxyResponse) {
+	record := Websocket{
+		WebsocketKey: WebsocketKey{
+			ID: fmt.Sprintf("websocket.%s", event.RequestContext.Identity.SourceIP),
+		},
+		WebsocketData: WebsocketData{
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		},
+	}
+	switch route := event.RequestContext.RouteKey; route {
+	case "$connect":
+		item, err := dynamodbattribute.MarshalMap(record.WebsocketKey)
+		if err != nil {
+			panic(err)
+		}
+		out, err := lib.DynamoDBClient().GetItem(&dynamodb.GetItemInput{
+			Key:       item,
+			TableName: aws.String(os.Getenv("PROJECT_NAME")),
+		})
+		if err != nil {
+			panic(err)
+		}
+		if out.Item != nil {
+			err = dynamodbattribute.UnmarshalMap(out.Item, &record)
+			if err != nil {
+				panic(err)
+			}
+			connectionID := record.ConnectionID
+			if connectionID != "" {
+				_ = lib.ApiWebsocketClose(ctx, os.Getenv("PROJECT_DOMAIN_WEBSOCKET"), connectionID)
+			}
+		}
+		record.ConnectionID = event.RequestContext.ConnectionID
+		item, err = dynamodbattribute.MarshalMap(record)
+		if err != nil {
+			panic(err)
+		}
+		_, err = lib.DynamoDBClient().PutItem(&dynamodb.PutItemInput{
+			Item:      item,
+			TableName: aws.String(os.Getenv("PROJECT_NAME")),
+		})
+		if err != nil {
+			panic(err)
+		}
+		invokeWebsocketSender()
+		res <- events.APIGatewayProxyResponse{StatusCode: 200}
+		return
+	case "$default":
+		data, err := json.Marshal(map[string]string{
+			"thanks for": event.Body,
+		})
+		if err != nil {
+			panic(err)
+		}
+		err = lib.ApiWebsocketSend(ctx, os.Getenv("PROJECT_DOMAIN_WEBSOCKET"), event.RequestContext.ConnectionID, data)
+		if err != nil {
+			panic(err)
+		}
+		res <- events.APIGatewayProxyResponse{StatusCode: 200}
+		return
+	case "$disconnect":
+		connectionID := event.RequestContext.ConnectionID
+		_ = lib.ApiWebsocketClose(ctx, os.Getenv("PROJECT_DOMAIN_WEBSOCKET"), connectionID)
+		item, err := dynamodbattribute.MarshalMap(record.WebsocketKey)
+		if err != nil {
+			panic(err)
+		}
+		_, err = lib.DynamoDBClient().DeleteItem(&dynamodb.DeleteItemInput{
+			Key:       item,
+			TableName: aws.String(os.Getenv("PROJECT_NAME")),
+		})
+		if err != nil {
+			panic(err)
+		}
+		res <- events.APIGatewayProxyResponse{StatusCode: 200}
+		return
+	default:
+		panic(lib.PformatAlways(event))
+	}
+}
+
+func websocketRouteKey(event map[string]interface{}) string {
+	val, ok := event["requestContext"].(map[string]interface{})
+	if ok {
+		routeKey, ok := val["routeKey"].(string)
+		if ok {
+			return routeKey
+		}
+	}
+	return ""
+}
+
+func websocketConnectionID(event map[string]interface{}) string {
+	val, ok := event["requestContext"].(map[string]interface{})
+	if ok {
+		connectionID, ok := val["connectionId"].(string)
+		if ok {
+			return connectionID
+		}
+	}
+	return ""
+}
+
+func invokeWebsocketSender() {
+	data, err := json.Marshal(map[string]string{
+		"detail-type": "websocket-sender",
+	})
+	if err != nil {
+		panic(err)
+	}
+	invokeOut, err := lib.LambdaClient().Invoke(&sdkLambda.InvokeInput{
+		FunctionName:   aws.String(os.Getenv("AWS_LAMBDA_FUNCTION_NAME")),
+		InvocationType: aws.String(sdkLambda.InvocationTypeEvent),
+		LogType:        aws.String(sdkLambda.LogTypeNone),
+		Payload:        data,
+	})
+	if err != nil {
+		panic(err)
+	}
+	if *invokeOut.StatusCode != 202 {
+		panic(fmt.Sprintf("status %d", *invokeOut.StatusCode))
+	}
+}
+
+func websocketSender(ctx context.Context) {
+	startTime := time.Now()
+	table := os.Getenv("PROJECT_NAME")
+	lockId := "lock.sender"
+	lockUid := uuid.Must(uuid.NewV4()).String()
+	maxAge := time.Second * 30
+	heartbeatInterval := time.Second * 5
+	releaseLock, err := dynamolock.AcquireLock(
+		ctx,
+		table,
+		lockId,
+		lockUid,
+		maxAge,
+		heartbeatInterval,
+	)
+	if err != nil {
+		// another sender is already running
+		return
+	}
+	defer releaseLock()
+	for {
+		// scan db for all open websockets
+		count := 0
+		var start map[string]*dynamodb.AttributeValue
+		for {
+			out, err := lib.DynamoDBClient().ScanWithContext(ctx, &dynamodb.ScanInput{
+				TableName:         aws.String(os.Getenv("PROJECT_NAME")),
+				ExclusiveStartKey: start,
+			})
+			if err != nil {
+				lib.Logger.Println("error:", err)
+				return
+			}
+			for _, item := range out.Items {
+				val := Websocket{}
+				err := dynamodbattribute.UnmarshalMap(item, &val)
+				if err != nil {
+					lib.Logger.Println("error:", err)
+					return
+				}
+				if strings.HasPrefix(val.ID, "websocket.") {
+					t, err := time.Parse(time.RFC3339, val.Timestamp)
+					if err != nil || time.Since(t) > 130*time.Minute {
+						// close and cleanup db for stale connections. apigateway max is 2 hours
+						_ = lib.ApiWebsocketClose(ctx, os.Getenv("PROJECT_DOMAIN_WEBSOCKET"), val.ConnectionID)
+						item, err := dynamodbattribute.MarshalMap(val.WebsocketKey)
+						if err != nil {
+							lib.Logger.Println("error:", err)
+							continue
+						}
+						_, err = lib.DynamoDBClient().DeleteItem(&dynamodb.DeleteItemInput{
+							Key:       item,
+							TableName: aws.String(os.Getenv("PROJECT_NAME")),
+						})
+						if err != nil {
+							lib.Logger.Println("error:", err)
+							continue
+						}
+					} else {
+						// send the current time to each open websocket
+						count++
+						go func(val Websocket) {
+							data, err := json.Marshal(map[string]string{"time": timestamp()})
+							if err != nil {
+								lib.Logger.Println("error:", err)
+								return
+							}
+							err = lib.ApiWebsocketSend(ctx, os.Getenv("PROJECT_DOMAIN_WEBSOCKET"), val.ConnectionID, data)
+							if err != nil {
+								lib.Logger.Println("error:", err)
+								return
+							}
+						}(val)
+					}
+				}
+			}
+			if out.LastEvaluatedKey == nil {
+				break
+			}
+			start = out.LastEvaluatedKey
+		}
+		// when no open connections, exit
+		if count == 0 {
+			return
+		}
+		// sleep
+		time.Sleep(1 * time.Second)
+		// start a new sender before this lambda times out
+		if time.Since(startTime) > 14*time.Minute {
+			invokeWebsocketSender()
+			return
+		}
+	}
+}
+
 func handle(ctx context.Context, event map[string]interface{}, res chan<- events.APIGatewayProxyResponse) {
 	defer func() {
 		if r := recover(); r != nil {
 			logRecover(r, res)
 		}
 	}()
+	if event["detail-type"] == "websocket-sender" {
+		websocketSender(ctx)
+		res <- events.APIGatewayProxyResponse{StatusCode: 200}
+		return
+	} else if websocketConnectionID(event) != "" {
+		websocketEvent := &events.APIGatewayWebsocketProxyRequest{}
+		data, err := json.Marshal(event)
+		if err != nil {
+			panic(err)
+		}
+		err = json.Unmarshal(data, &websocketEvent)
+		if err != nil {
+			panic(err)
+		}
+		handleWebsocketEvent(ctx, websocketEvent, res)
+		return
+	}
 	_, ok := event["path"]
 	if !ok {
 		res <- notfound()
@@ -229,13 +487,31 @@ func handle(ctx context.Context, event map[string]interface{}, res chan<- events
 	apiEvent := &events.APIGatewayProxyRequest{}
 	data, err := json.Marshal(event)
 	if err != nil {
-	    panic(err)
+		panic(err)
 	}
 	err = json.Unmarshal(data, &apiEvent)
 	if err != nil {
 		panic(err)
 	}
 	handleApiEvent(ctx, apiEvent, res)
+}
+
+func sourceIP(event map[string]interface{}) string {
+	req, ok := event["requestContext"].(map[string]interface{})
+	if ok {
+		identity, ok := req["identity"].(map[string]interface{})
+		if ok {
+			sourceIP, ok := identity["sourceIp"].(string)
+			if ok {
+				return sourceIP
+			}
+		}
+	}
+	return ""
+}
+
+func timestamp() string {
+	return time.Now().UTC().Format(time.RFC3339)
 }
 
 func handleRequest(ctx context.Context, event map[string]interface{}) (events.APIGatewayProxyResponse, error) {
@@ -245,13 +521,16 @@ func handleRequest(ctx context.Context, event map[string]interface{}) (events.AP
 	res := make(chan events.APIGatewayProxyResponse)
 	go handle(ctx, event, res)
 	r := <-res
-	path, ok := event["path"]
-	ts := time.Now().UTC().Format(time.RFC3339)
-	if ok {
-		ip := event["requestContext"].(map[string]interface{})["identity"].(map[string]interface{})["sourceIp"].(string)
-		lib.Logger.Println("http", r.StatusCode, path, time.Since(start), ip, ts)
+	routeKey := websocketRouteKey(event)
+	path := event["path"]
+	if event["detail-type"] == "websocket-sender" {
+		lib.Logger.Println("websocket-sender", time.Since(start), timestamp())
+	} else if routeKey != "" {
+		lib.Logger.Println("websocket", r.StatusCode, routeKey, time.Since(start), sourceIP(event), timestamp())
+	} else if path != "" {
+		lib.Logger.Println("http", r.StatusCode, path, time.Since(start), sourceIP(event), timestamp())
 	} else {
-		lib.Logger.Println("async", time.Since(start), ts)
+		lib.Logger.Println("async", time.Since(start), timestamp())
 	}
 	return r, nil
 }

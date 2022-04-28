@@ -2,12 +2,13 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs-http.client :as http]
             [cljs.core.async :refer [<! >! chan timeout] :as a]
-            [cljs.pprint]
+            [cljs.pprint :as pp]
             [reagent.dom :as reagent.dom]
             [reagent.core :as reagent]
             [bide.core :as bide]
             [garden.core :as garden]
             [clojure.string :as s]
+            [haslett.client :as ws]
             [reagent-mui.material.app-bar :refer [app-bar]]
             [reagent-mui.material.card :refer [card]]
             [reagent-mui.material.text-field :refer [text-field]]
@@ -128,11 +129,28 @@
      ^{:key (gen-id)} [card card-style
                        [typography line]])])
 
-(defn component-dms []
-  [card card-style
-   [typography "dms"]])
+(goog-define ws-domain "") ;; defined via environment variable PROJECT_DOMAIN_WEBSOCKET
 
-(defn component-time []
+(defn start-websocket []
+  (go
+    (let [uid (js/Date.now)
+          url (str "wss://" ws-domain)
+          new-stream #(go (let [stream (<! (ws/connect url {}))]
+                            (swap! state assoc :websocket-stream stream)
+                            stream))]
+      (loop [stream (<! (new-stream))]
+        (a/alt!
+          (:source stream) ([data] (let [val (js->clj (js/JSON.parse data) :keywordize-keys true)]
+                                     (swap! state assoc :websocket-time (:time val))
+                                     (when (= stream (:websocket-stream @state))
+                                       (recur stream))))
+          (:close-status stream) ([close-status] (recur (<! (new-stream)))))))))
+
+(defn component-websocket []
+  [card card-style
+   [typography "time: " (:websocket-time @state)]])
+
+(defn component-api []
   (if (nil? (:time @state))
     (do (go (let [resp (<! (api-get "/api/time" {}))]
               (swap! state assoc :time (:time (:body resp)))))
@@ -181,8 +199,8 @@
     [toolbar {:style {:padding 0}}
      [component-menu-button "home" component-home  home]
      [component-menu-button "files" component-files  folder]
-     [component-menu-button "dms" component-dms sms]
-     [component-menu-button "time" component-time access-time]
+     [component-menu-button "api" component-api access-time]
+     [component-menu-button "websocket" component-websocket sms]
      [text-field {:placeholder "search"
                   :ref #(reset! search-ref %)
                   :id "search"
@@ -270,8 +288,8 @@
    ["/files" component-files]
    ["/search" component-search]
    ["/search/(.*)" component-search]
-   ["/dms" component-dms]
-   ["/time" component-time]
+   ["/websocket" component-websocket]
+   ["/api" component-api]
    ["(.*)" component-not-found]])
 
 (defn start-router []
@@ -283,6 +301,7 @@
   (reagent.dom/render [component-root] (js/document.getElementById "app")))
 
 (defn ^:dev/after-load main []
+  (start-websocket)
   (start-router)
   (document-listener "keydown" keydown-listener)
   (document-listener "mousedown" mousedown-listener)
