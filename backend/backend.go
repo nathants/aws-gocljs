@@ -136,7 +136,7 @@ func notfound() events.APIGatewayProxyResponse {
 	}
 }
 
-func httpVersionGet(ctx context.Context, event *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
+func httpVersionGet(_ context.Context, _ *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
 	val := map[string]string{}
 	err := filepath.Walk(".", func(file string, _ os.FileInfo, err error) error {
 		if err != nil {
