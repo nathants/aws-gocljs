@@ -361,7 +361,12 @@ func invokeWebsocketSender() {
 	}
 }
 
-func websocketSender(ctx context.Context) {
+func websocketSender(ctx context.Context, res chan<- events.APIGatewayProxyResponse) {
+	defer func() {
+		if r := recover(); r != nil {
+			logRecover(r, res)
+		}
+	}()
 	startTime := time.Now()
 	table := os.Getenv("PROJECT_NAME")
 	lockId := "lock.sender"
@@ -423,6 +428,11 @@ func websocketSender(ctx context.Context) {
 						// send the current time to each open websocket
 						count++
 						go func(val Websocket) {
+							defer func() {
+								if r := recover(); r != nil {
+									logRecover(r, res)
+								}
+							}()
 							data, err := json.Marshal(map[string]string{"time": timestamp()})
 							if err != nil {
 								lib.Logger.Println("error:", err)
@@ -463,7 +473,7 @@ func handle(ctx context.Context, event map[string]interface{}, res chan<- events
 		}
 	}()
 	if event["detail-type"] == "websocket-sender" {
-		websocketSender(ctx)
+		websocketSender(ctx, res)
 		res <- events.APIGatewayProxyResponse{StatusCode: 200}
 		return
 	} else if websocketConnectionID(event) != "" {
@@ -572,6 +582,7 @@ func setupLogging(ctx context.Context) {
 		},
 	}
 	go func() {
+		// defer func() {}()
 		for {
 			lib.Logger.Flush()
 			select {
