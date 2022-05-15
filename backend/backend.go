@@ -1,26 +1,3 @@
-//
-// attr: name ${PROJECT_NAME}
-// attr: concurrency 0
-// attr: memory 128
-// attr: timeout 900
-//
-// dynamodb: ${PROJECT_NAME} id:s:hash
-// s3: ${PROJECT_BUCKET} cors=true acl=private ttldays=14
-//
-// trigger: api dns=${PROJECT_DOMAIN}
-// trigger: websocket dns=${PROJECT_DOMAIN_WEBSOCKET}
-// trigger: cloudwatch rate(5 minutes)
-//
-// policy: AWSLambdaBasicExecutionRole
-// allow: dynamodb:* arn:aws:dynamodb:${AWS_DEFAULT_REGION}:*:table/${PROJECT_NAME}
-// allow: s3:* arn:aws:s3:::${PROJECT_BUCKET}/*
-// allow: execute-api:ManageConnections arn:aws:execute-api:${AWS_DEFAULT_REGION}:*:${WEBSOCKET_ID}/*/*/*
-// allow: lambda:InvokeFunction arn:aws:lambda:*:*:function:${PROJECT_NAME}
-//
-// include: ../frontend/public/index.html.gzip
-// include: ../frontend/public/favicon.png
-//
-
 package main
 
 import (
@@ -51,8 +28,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/dustin/go-humanize"
 	uuid "github.com/gofrs/uuid"
-	"github.com/nathants/cli-aws/lib"
 	"github.com/nathants/go-dynamolock"
+	"github.com/nathants/libaws/lib"
 )
 
 type WebsocketKey struct {
@@ -576,8 +553,7 @@ func setupLogging(ctx context.Context) {
 				return err
 			})
 			if err != nil {
-				lib.Logger.Println("error:", err)
-				return
+				fmt.Println("error:", err)
 			}
 		},
 	}

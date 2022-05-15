@@ -8,8 +8,11 @@ web dev should be easier.
 
 demo: https://gocljs.nathants.com
 
-a template for a project with:
- - go backend on lambda with s3 and dynamodb
+a template for a web project with an aws [infrastructure set](https://github.com/nathants/libaws#infrastructure-set) containing:
+ - go backend on lambda
+ - api lambda trigger
+ - websocket lambda trigger
+ - s3 and dynamodb for state
  - cljs frontend with reagent
  - dead simple operations
  - fast development cycle
@@ -17,31 +20,28 @@ a template for a project with:
 
 ## dependencies
 
+use the included [Dockerfile](./Dockerfile) or install the following dependencies:
 - npm
 - jdk
 - go
 - bash
 - [entr](https://formulae.brew.sh/formula/entr)
 
-## prerequisites
+## aws prerequisites
 
-required because of `// trigger: api dns=${PROJECT_DOMAIN}` in backend/backend.go:
 - aws [route53](https://console.aws.amazon.com/route53/v2/hostedzones) has the domain or its parent from env.sh
-- aws [acm](https://us-west-2.console.aws.amazon.com/acm/home) has a regional cert for the domain or a wildcard cert for its parent from env.sh
 
-## alternative
-
-to drop the dependency on route53 and acm change trigger to:
-- `// trigger: api`
-
-then find apigateway url with:
-- `cli-aws lambda-api backend/backend.go`
+- aws [acm](https://us-west-2.console.aws.amazon.com/acm/home) has a wildcard cert for the domain or its parent from env.sh
 
 ## install
 
-`go install github.com/nathants/cli-aws@latest`
+```bash
+go install github.com/nathants/libaws@latest
 
+export PATH=$PATH:$(go env GOPATH)/bin
 ```
+
+```bash
 git clone https://github.com/nathants/new-gocljs
 cd new-gocljs
 cp env.sh.template env.sh # update values

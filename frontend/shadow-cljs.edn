@@ -13,4 +13,5 @@
                 :output-dir "public/js"
                 :js-options {:js-provider :shadow}
                 :modules {:main {:init-fn frontend/main}}
-                :closure-defines {frontend/ws-domain #shadow/env "PROJECT_DOMAIN_WEBSOCKET"}}}}
+                :closure-defines {frontend/ws-domain #shadow/env "PROJECT_DOMAIN_WEBSOCKET"}
+                :compiler-options {:warnings {:redef false}}}}}
