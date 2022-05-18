@@ -4,11 +4,11 @@ go 1.17
 
 require (
 	github.com/aws/aws-lambda-go v1.31.1
-	github.com/aws/aws-sdk-go v1.44.6
+	github.com/aws/aws-sdk-go v1.44.9
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gofrs/uuid v4.2.0+incompatible
-	github.com/nathants/go-dynamolock v0.0.0-20220331091039-763628f4e5fd
-	github.com/nathants/libaws v0.0.0-20220515084404-fb21bb5135f2
+	github.com/nathants/go-dynamolock v0.0.0-20220518065221-3e2eb9e893a9
+	github.com/nathants/libaws v0.0.0-20220515093445-c4a362791643
 )
 
 require (
@@ -17,10 +17,8 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mikesmitty/edkey v0.0.0-20170222072505-3356ea4e686a // indirect
-	github.com/nathants/cli-aws v0.0.0-20220331075614-7e62d2648cf1 // indirect
 	github.com/pkg/term v1.1.0 // indirect
 	github.com/r3labs/diff/v2 v2.15.1 // indirect
-	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
