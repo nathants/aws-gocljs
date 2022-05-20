@@ -223,7 +223,7 @@ func handleWebsocketEvent(ctx context.Context, event *events.APIGatewayWebsocket
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		},
 	}
-	switch route := event.RequestContext.RouteKey; route {
+	switch event.RequestContext.RouteKey {
 	case "$connect":
 		item, err := dynamodbattribute.MarshalMap(record.WebsocketKey)
 		if err != nil {
