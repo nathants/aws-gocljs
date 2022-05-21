@@ -229,7 +229,7 @@ func handleWebsocketEvent(ctx context.Context, event *events.APIGatewayWebsocket
 		if err != nil {
 			panic(err)
 		}
-		out, err := lib.DynamoDBClient().GetItem(&dynamodb.GetItemInput{
+		out, err := lib.DynamoDBClient().GetItemWithContext(ctx, &dynamodb.GetItemInput{
 			Key:       item,
 			TableName: aws.String(os.Getenv("PROJECT_NAME")),
 		})
@@ -251,7 +251,7 @@ func handleWebsocketEvent(ctx context.Context, event *events.APIGatewayWebsocket
 		if err != nil {
 			panic(err)
 		}
-		_, err = lib.DynamoDBClient().PutItem(&dynamodb.PutItemInput{
+		_, err = lib.DynamoDBClient().PutItemWithContext(ctx, &dynamodb.PutItemInput{
 			Item:      item,
 			TableName: aws.String(os.Getenv("PROJECT_NAME")),
 		})
@@ -281,7 +281,7 @@ func handleWebsocketEvent(ctx context.Context, event *events.APIGatewayWebsocket
 		if err != nil {
 			panic(err)
 		}
-		_, err = lib.DynamoDBClient().DeleteItem(&dynamodb.DeleteItemInput{
+		_, err = lib.DynamoDBClient().DeleteItemWithContext(ctx, &dynamodb.DeleteItemInput{
 			Key:       item,
 			TableName: aws.String(os.Getenv("PROJECT_NAME")),
 		})
@@ -393,7 +393,7 @@ func websocketSender(ctx context.Context, res chan<- events.APIGatewayProxyRespo
 							lib.Logger.Println("error:", err)
 							continue
 						}
-						_, err = lib.DynamoDBClient().DeleteItem(&dynamodb.DeleteItemInput{
+						_, err = lib.DynamoDBClient().DeleteItemWithContext(ctx, &dynamodb.DeleteItemInput{
 							Key:       item,
 							TableName: aws.String(os.Getenv("PROJECT_NAME")),
 						})
