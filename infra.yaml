@@ -38,7 +38,7 @@ lambda:
       - execute-api:ManageConnections arn:aws:execute-api:${AWS_DEFAULT_REGION}:*:${WEBSOCKET_ID}/*/*/*
       - lambda:InvokeFunction arn:aws:lambda:*:*:function:${PROJECT_NAME}
     include:
-      - frontend/public/index.html.gzip
+      - frontend/public/index.html.gz
       - frontend/public/favicon.png
     env:
       - PROJECT_NAME=${PROJECT_NAME}
