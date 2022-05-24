@@ -237,7 +237,7 @@
   (cond
     (:modal-open @state) (swap! state assoc :modal-open false)
     (= "Enter" (event-key e)) (when (:search-focus @state)
-                                nil)
+                                (swap! state update-in [:search-text] str "/Enter"))
     (= "?" (event-key e))    (swap! state assoc :modal-open true)
     (#{"INPUT" "TEXTAREA"} (.-tagName js/document.activeElement)) nil
     (= "h" (event-key e)) (navigate-to "/home")
