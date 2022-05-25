@@ -9,6 +9,10 @@ set -eou pipefail
 #
 # this means your local internet only needs to upload source code changes, not lambda zips.
 #
+# with current spot pricing for c5.large in us-west-2, if you run this instance 8 hours a day 20 days a month, it will cost ~$5/month.
+#
+# this instance will self destruct after 1 hour without activity, via `--seconds-timeout 3600`.
+#
 # usage:
 #
 #   bash bin/relay.sh "bash -c 'cd new-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'"
@@ -31,6 +35,7 @@ if ! libaws ec2-ls -s running $name &>/dev/null; then
            --gigs 32 \
            --type c5.large \
            --spot capacityOptimized \
+           --seconds-timeout 3600 \
            $name
     libaws ec2-wait-ssh $name
 fi
@@ -66,7 +71,7 @@ libaws ec2-ssh $name -c '
 '
 
 ## copy all source to to relay, after this we only copy what changes
-export RSYNC_OPTIONS="--exclude .shadow-cljs --exclude node_modules --exclude .backups --exclude *.~undo-tree~ --exclude .clj-kondo"
+export RSYNC_OPTIONS="--exclude frontend/public/js/ --exclude .shadow-cljs --exclude node_modules --exclude .backups --exclude *.~undo-tree~ --exclude .clj-kondo"
 libaws ec2-rsync $(pwd)/ :new-gocljs/ $name
 
 cd ..

@@ -152,10 +152,8 @@
 
 (defn component-api []
   (if (nil? (:time @state))
-    (do (go (let [resp (<! (api-get "/api/time" {}))]
-              (swap! state assoc :time (:time (:body resp)))))
-        [card card-style
-         [linear-progress {:style {:height "13px" :margin "2px"}}]])
+    [card card-style
+     [linear-progress {:style {:height "13px" :margin "2px"}}]]
     [card card-style
      [typography (str "time: " (:time @state))]]))
 
@@ -274,6 +272,10 @@
   (when (= component-search component)
     (when-let [val (:0 data)]
       (swap! state assoc :search-text (js/decodeURIComponent val))))
+  (when (= component-api component)
+    (swap! state assoc :time nil)
+    (go (let [resp (<! (api-get "/api/time" {}))]
+          (swap! state assoc :time (:time (:body resp))))))
   (swap! state merge {:page component :parts (href-parts)}))
 
 (defn document-listener [name f]

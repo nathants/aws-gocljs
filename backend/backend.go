@@ -415,11 +415,7 @@ func websocketSender(ctx context.Context, res chan<- events.APIGatewayProxyRespo
 								lib.Logger.Println("error:", err)
 								return
 							}
-							err = lib.ApiWebsocketSend(ctx, os.Getenv("PROJECT_DOMAIN_WEBSOCKET"), val.ConnectionID, data)
-							if err != nil {
-								lib.Logger.Println("error:", err)
-								return
-							}
+							_ = lib.ApiWebsocketSend(ctx, os.Getenv("PROJECT_DOMAIN_WEBSOCKET"), val.ConnectionID, data)
 						}(val)
 					}
 				}
@@ -509,12 +505,12 @@ func handleRequest(ctx context.Context, event map[string]interface{}) (events.AP
 	go handle(ctx, event, res)
 	r := <-res
 	routeKey := websocketRouteKey(event)
-	path := event["path"]
+	path, pathOk := event["path"]
 	if event["detail-type"] == "websocket-sender" {
 		lib.Logger.Println("websocket-sender", time.Since(start), timestamp())
 	} else if routeKey != "" {
 		lib.Logger.Println("websocket", r.StatusCode, routeKey, time.Since(start), sourceIP(event), timestamp())
-	} else if path != "" {
+	} else if pathOk {
 		lib.Logger.Println("http", r.StatusCode, path, time.Since(start), sourceIP(event), timestamp())
 	} else {
 		lib.Logger.Println("async", time.Since(start), timestamp())

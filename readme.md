@@ -2,21 +2,31 @@
 
 ## why
 
-web dev should be easier.
+fullstack web should be easy and fun.
+
+## how
+
+start with working implementations of everything, then [tinker and tweak](#sdlc-demo) until your app is complete!
+
+fast and reliable [automation](https://github.com/nathants/new-gocljs/tree/master/bin).
+
+easy browser [testing](https://github.com/nathants/py-webengine).
 
 ## what
 
-demo: https://gocljs.nathants.com
-
-a template for a web project with an aws [infrastructure set](https://github.com/nathants/libaws#infrastructure-set) containing:
- - go backend on lambda
- - api lambda trigger
- - websocket lambda trigger
+a fullstack project scaffold for aws with a ready-to-deploy [infrastructure set](https://github.com/nathants/libaws#infrastructure-set) containing:
+ - go on lambda for backend
+ - clojurescript and [react](http://reagent-project.github.io/) for frontend
  - s3 and dynamodb for state
- - cljs frontend with reagent
- - dead simple operations
- - fast development cycle
- - fast deploy cycle
+ - http and websocket apis
+ - low latency [logging](https://github.com/nathants/new-gocljs/tree/master/bin/logs.sh)
+ - automated [devops](https://github.com/nathants/new-gocljs/tree/master/bin)
+
+a live demo on aws is [here](https://gocljs.nathants.com).
+
+## sdlc demo
+
+![](https://github.com/nathants/new-gocljs/raw/master/demo.gif)
 
 ## dependencies
 
@@ -26,6 +36,7 @@ use the included [Dockerfile](./Dockerfile) or install the following dependencie
 - go
 - bash
 - [entr](https://formulae.brew.sh/formula/entr)
+- [libaws](https://github.com/nathants/libaws)
 
 ## aws prerequisites
 
@@ -36,18 +47,26 @@ use the included [Dockerfile](./Dockerfile) or install the following dependencie
 ## install
 
 ```bash
-go install github.com/nathants/libaws@latest
-
-export PATH=$PATH:$(go env GOPATH)/bin
-```
-
-```bash
 git clone https://github.com/nathants/new-gocljs
 cd new-gocljs
 cp env.sh.template env.sh # update values
+```
+
+## usage
+
+```bash
 bash bin/check.sh         # lint
-bash bin/deploy.sh        # ensure aws infra and deploy prod release
-bash bin/dev.sh           # rapidly iterate on lambda backend and localhost:8000 frontend
+bash bin/preview.sh       # preview changes to aws infra
+bash bin/ensure.sh        # ensure aws infra and deploy prod release
+bash bin/dev.sh           # rapidly iterate on lambda backend and localhost frontend
 bash bin/logs.sh          # tail the logs
-bash bin/delete.sh        # delete
+bash bin/delete.sh        # delete aws infra
+```
+
+if you have bad upload bandwidth:
+
+```bash
+# bash bin/dev.sh                                                                  # this requires good upload bandwidth
+bash bin/dev_frontend.sh                                                           # rapidly iterate on localhost frontend
+bash bin/relay.sh "bash -c 'cd new-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'" # rapidly iterate on backend via ec2 relay
 ```
