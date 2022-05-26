@@ -24,6 +24,25 @@ a fullstack project scaffold for aws with a ready-to-deploy [infrastructure set]
 
 a live demo on aws is [here](https://gocljs.nathants.com).
 
+## lambda zip
+
+the lambda zip contains only 3 files:
+
+```bash
+>> ls -lh | awk '{print $9, $5}' | column -t
+
+favicon.png    2.7K # favicon
+index.html.gz  296K # react spa
+main           15M  # go binary
+```
+
+the lambda zip itself:
+
+```bash
+>> ls -lh | awk '{print $9, $5}'
+lambda.zip 4.6M
+```
+
 ## sdlc demo
 
 ![](https://github.com/nathants/new-gocljs/raw/master/demo.gif)
