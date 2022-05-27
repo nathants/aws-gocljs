@@ -76,8 +76,8 @@ cp env.sh.template env.sh # update values
 ```bash
 bash bin/check.sh         # lint
 bash bin/preview.sh       # preview changes to aws infra
-bash bin/ensure.sh        # ensure aws infra and deploy prod release
-bash bin/dev.sh           # rapidly iterate on lambda backend and localhost frontend
+bash bin/ensure.sh        # ensure aws infra
+bash bin/dev.sh           # iterate on backend and frontend
 bash bin/logs.sh          # tail the logs
 bash bin/delete.sh        # delete aws infra
 ```
@@ -85,7 +85,7 @@ bash bin/delete.sh        # delete aws infra
 if you have bad upload bandwidth:
 
 ```bash
-# bash bin/dev.sh                                                                  # this requires good upload bandwidth
-bash bin/dev_frontend.sh                                                           # rapidly iterate on localhost frontend
-bash bin/relay.sh "bash -c 'cd new-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'" # rapidly iterate on backend via ec2 relay
+# bash bin/dev.sh                                                                  # this needs upload bandwidth
+bash bin/dev_frontend.sh                                                           # iterate on localhost frontend
+bash bin/relay.sh "bash -c 'cd new-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'" # iterate on backend via ec2 relay
 ```
