@@ -5,4 +5,7 @@ source env.sh
 
 echo rebuild ${PROJECT_NAME}
 
+touch frontend/public/index.html.gz
+touch frontend/public/favicon.png
+
 time libaws infra-ensure infra.yaml --quick ${PROJECT_NAME}
