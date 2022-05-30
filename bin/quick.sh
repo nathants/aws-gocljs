@@ -3,8 +3,6 @@ set -eou pipefail
 
 source env.sh
 
-echo rebuild ${PROJECT_NAME}
-
 touch frontend/public/index.html.gz
 touch frontend/public/favicon.png
 
