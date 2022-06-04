@@ -18,7 +18,7 @@ set -eou pipefail
 #   bash bin/relay.sh "bash -c 'cd new-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'"
 #
 
-. env.sh
+source env.sh
 
 remote_cmd=$1
 name=relay
