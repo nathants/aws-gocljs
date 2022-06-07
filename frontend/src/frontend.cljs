@@ -62,7 +62,7 @@
     :key-listener false
     :mouse-listener false
     :search-text ""
-    :page home
+    :page nil
     :time nil}))
 
 (def style
