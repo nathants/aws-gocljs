@@ -9,19 +9,19 @@
             [garden.core :as garden]
             [clojure.string :as s]
             [haslett.client :as ws]
-            [reagent-mui.material.app-bar :refer [app-bar]]
-            [reagent-mui.material.card :refer [card]]
-            [reagent-mui.material.text-field :refer [text-field]]
-            [reagent-mui.material.container :refer [container]]
-            [reagent-mui.material.grid :refer [grid]]
-            [reagent-mui.material.linear-progress :refer [linear-progress]]
-            [reagent-mui.material.icon-button :refer [icon-button]]
-            [reagent-mui.material.toolbar :refer [toolbar]]
-            [reagent-mui.material.typography :refer [typography]]
-            [reagent-mui.icons.home :refer [home]]
-            [reagent-mui.icons.sms :refer [sms]]
-            [reagent-mui.icons.access-time :refer [access-time]]
-            [reagent-mui.icons.folder :refer [folder]]))
+            [reagent-mui.material.app-bar :refer [app-bar] :rename {app-bar mui-app-bar}]
+            [reagent-mui.material.card :refer [card] :rename {card mui-card}]
+            [reagent-mui.material.text-field :refer [text-field] :rename {text-field mui-text-field}]
+            [reagent-mui.material.container :refer [container] :rename {container mui-container}]
+            [reagent-mui.material.grid :refer [grid] :rename {grid mui-grid}]
+            [reagent-mui.material.linear-progress :refer [linear-progress] :rename {linear-progress mui-linear-progress}]
+            [reagent-mui.material.icon-button :refer [icon-button] :rename {icon-button mui-icon-button}]
+            [reagent-mui.material.toolbar :refer [toolbar] :rename {toolbar mui-toolbar}]
+            [reagent-mui.material.typography :refer [typography] :rename {typography mui-typography}]
+            [reagent-mui.icons.home :refer [home] :rename {home mui-home}]
+            [reagent-mui.icons.sms :refer [sms] :rename {sms mui-sms}]
+            [reagent-mui.icons.access-time :refer [access-time] :rename {access-time mui-access-time}]
+            [reagent-mui.icons.folder :refer [folder] :rename {folder mui-folder}]))
 
 (set! *warn-on-infer* true)
 
@@ -116,18 +116,18 @@
         :else (throw "failed after several tries")))))
 
 (defn component-home []
-  [card card-style
-   [typography "home"]])
+  [mui-card card-style
+   [mui-typography "home"]])
 
 (defn component-files []
-  [card card-style
-   [typography "files"]])
+  [mui-card card-style
+   [mui-typography "files"]])
 
 (defn component-search []
   [:<>
    (for [line (remove s/blank? (s/split (:search-text @state) #"/"))]
-     ^{:key (gen-id)} [card card-style
-                       [typography line]])])
+     ^{:key (gen-id)} [mui-card card-style
+                       [mui-typography line]])])
 
 (goog-define ws-domain "") ;; defined via environment variable PROJECT_DOMAIN_WEBSOCKET
 
@@ -147,41 +147,41 @@
           (:close-status stream) ([close-status] (recur (<! (new-stream)))))))))
 
 (defn component-websocket []
-  [card card-style
-   [typography "time: " (:websocket-time @state)]])
+  [mui-card card-style
+   [mui-typography "time: " (:websocket-time @state)]])
 
 (defn component-api []
   (if (nil? (:time @state))
-    [card card-style
-     [linear-progress {:style {:height "13px" :margin "2px"}}]]
-    [card card-style
-     [typography (str "time: " (:time @state))]]))
+    [mui-card card-style
+     [mui-linear-progress {:style {:height "13px" :margin "2px"}}]]
+    [mui-card card-style
+     [mui-typography (str "time: " (:time @state))]]))
 
 (defn component-not-found []
   [:div
    [:p "404"]])
 
 (defn component-menu-button [page-name page-component icon]
-  [icon-button {:id page-name
-                :disable-ripple true
-                :class "menu-button"
-                :href (str "#/" page-name)
-                :style  (merge {:padding "15px"}
-                               (if (= page-component (:page @state))
-                                 {:color "red"}))}
-   [grid
+  [mui-icon-button {:id page-name
+                    :disable-ripple true
+                    :class "menu-button"
+                    :href (str "#/" page-name)
+                    :style  (merge {:padding "15px"}
+                                   (if (= page-component (:page @state))
+                                     {:color "red"}))}
+   [mui-grid
     [icon]
-    [typography {:style {:font-weight 700}} page-name]]])
+    [mui-typography {:style {:font-weight 700}} page-name]]])
 
 (defn component-help []
-  [grid {:spacing 0
-         :alignItems "center"
-         :justify "center"
-         :style {:display "flex"
-                 :flexDirection "column"
-                 :justifyContent "center"
-                 :minHeight "100vh"}}
-   [card {:style {:padding "20px"}}
+  [mui-grid {:spacing 0
+             :alignItems "center"
+             :justify "center"
+             :style {:display "flex"
+                     :flexDirection "column"
+                     :justifyContent "center"
+                     :minHeight "100vh"}}
+   [mui-card {:style {:padding "20px"}}
     [:strong "keyboard shortcuts"]
     [:ul {:style {:padding-left "25px"}}
      [:li "h : home"]
@@ -193,26 +193,26 @@
 
 (defn component-main []
   [:<>
-   [app-bar {:position "relative"}
-    [toolbar {:style {:padding 0}}
-     [component-menu-button "home" component-home  home]
-     [component-menu-button "files" component-files  folder]
-     [component-menu-button "api" component-api access-time]
-     [component-menu-button "websocket" component-websocket sms]
-     [text-field {:placeholder "search"
-                  :ref #(reset! search-ref %)
-                  :id "search"
-                  :autoComplete "off"
-                  :spellCheck false
-                  :multiline false
-                  :fullWidth true
-                  :focused (:search-focus @state)
-                  :value (:search-text @state)
-                  :on-focus #(swap! state assoc :search-focus true)
-                  :on-blur #(swap! state assoc :search-focus false)
-                  :on-change #(swap! state assoc :search-text (target-value %))
-                  :style {:margin-left "0px" :padding-right "20px" :padding-left "5px"}}]]]
-   [container {:id "content" :style {:padding 0 :margin-top "10px"}}
+   [mui-app-bar {:position "relative"}
+    [mui-toolbar {:style {:padding 0}}
+     [component-menu-button "home" component-home  mui-home]
+     [component-menu-button "files" component-files  mui-folder]
+     [component-menu-button "api" component-api mui-access-time]
+     [component-menu-button "websocket" component-websocket mui-sms]
+     [mui-text-field {:placeholder "search"
+                      :ref #(reset! search-ref %)
+                      :id "search"
+                      :autoComplete "off"
+                      :spellCheck false
+                      :multiline false
+                      :fullWidth true
+                      :focused (:search-focus @state)
+                      :value (:search-text @state)
+                      :on-focus #(swap! state assoc :search-focus true)
+                      :on-blur #(swap! state assoc :search-focus false)
+                      :on-change #(swap! state assoc :search-text (target-value %))
+                      :style {:margin-left "0px" :padding-right "20px" :padding-left "5px"}}]]]
+   [mui-container {:id "content" :style {:padding 0 :margin-top "10px"}}
     [(:page @state)]]])
 
 (defn component-root []
