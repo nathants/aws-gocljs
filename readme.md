@@ -1,4 +1,4 @@
-# new-gocljs
+# aws-gocljs
 
 ## why
 
@@ -8,21 +8,21 @@ fullstack web should be easy and fun.
 
 start with working implementations of everything, then [tinker and tweak](#sdlc-demo) until your app is complete!
 
-fast and reliable [automation](https://github.com/nathants/new-gocljs/tree/master/bin).
+fast and reliable [automation](https://github.com/nathants/aws-gocljs/tree/master/bin).
 
 easy browser [testing](https://github.com/nathants/py-webengine).
 
 ## what
 
-a project scaffold for a fullstack webapp on aws with an [infrastructure set](https://github.com/nathants/new-gocljs/tree/master/infra.yaml) ready-to-deploy with [libaws](https://github.com/nathants/libaws).
+a project scaffold for a fullstack webapp on aws with an [infrastructure set](https://github.com/nathants/aws-gocljs/tree/master/infra.yaml) ready-to-deploy with [libaws](https://github.com/nathants/libaws).
 
 the project scaffold contains:
  - a go lambda backend.
  - a clojurescript and [react](http://reagent-project.github.io/) frontend.
  - s3 and dynamodb for state.
  - http and websocket apis.
- - low latency [logging](https://github.com/nathants/new-gocljs/tree/master/bin/logs.sh).
- - automated [devops](https://github.com/nathants/new-gocljs/tree/master/bin).
+ - low latency [logging](https://github.com/nathants/aws-gocljs/tree/master/bin/logs.sh).
+ - automated [devops](https://github.com/nathants/aws-gocljs/tree/master/bin).
 
 a live demo on aws is [here](https://gocljs.nathants.com).
 
@@ -47,7 +47,7 @@ lambda.zip 4.6M
 
 ## sdlc demo
 
-![](https://github.com/nathants/new-gocljs/raw/master/demo.gif)
+![](https://github.com/nathants/aws-gocljs/raw/master/demo.gif)
 
 ## dependencies
 
@@ -68,8 +68,8 @@ use the included [Dockerfile](./Dockerfile) or install the following dependencie
 ## install
 
 ```bash
-git clone https://github.com/nathants/new-gocljs
-cd new-gocljs
+git clone https://github.com/nathants/aws-gocljs
+cd aws-gocljs
 cp env.sh.template env.sh # update values
 ```
 
@@ -89,5 +89,5 @@ if you have bad upload bandwidth:
 ```bash
 # bash bin/dev.sh                                                                  # this needs upload bandwidth
 bash bin/dev_frontend.sh                                                           # iterate on localhost frontend
-bash bin/relay.sh "bash -c 'cd new-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'" # iterate on backend via ec2 relay
+bash bin/relay.sh "bash -c 'cd aws-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'" # iterate on backend via ec2 relay
 ```

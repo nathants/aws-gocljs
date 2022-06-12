@@ -1,4 +1,4 @@
-module new-gocljs
+module aws-gocljs
 
 go 1.17
 

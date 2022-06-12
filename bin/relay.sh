@@ -15,7 +15,7 @@ set -eou pipefail
 #
 # usage:
 #
-#   bash bin/relay.sh "bash -c 'cd new-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'"
+#   bash bin/relay.sh "bash -c 'cd aws-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'"
 #
 
 source env.sh
@@ -72,13 +72,13 @@ libaws ec2-ssh $name -c '
 
 ## copy all source to to relay, after this we only copy what changes
 export RSYNC_OPTIONS="--exclude frontend/public/js/ --exclude .shadow-cljs --exclude node_modules --exclude .backups --exclude *.~undo-tree~ --exclude .clj-kondo"
-libaws ec2-rsync $(pwd)/ :new-gocljs/ $name
+libaws ec2-rsync $(pwd)/ :aws-gocljs/ $name
 
 cd ..
 
 (
     ## watch these files for changes
-    find new-gocljs -type f | grep -e '\.go$' -e '\.mod$' -e '\.sum$' -e '\.yaml$' -e '\.sh$' | grep -v '/frontend/'
+    find aws-gocljs -type f | grep -e '\.go$' -e '\.mod$' -e '\.sum$' -e '\.yaml$' -e '\.sh$' | grep -v '/frontend/'
 
 ) | (
 
