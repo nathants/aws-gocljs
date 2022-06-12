@@ -14,13 +14,15 @@ easy browser [testing](https://github.com/nathants/py-webengine).
 
 ## what
 
-a fullstack project scaffold for aws with a ready-to-deploy [infrastructure set](https://github.com/nathants/libaws#infrastructure-set) containing:
- - go on lambda for backend
- - clojurescript and [react](http://reagent-project.github.io/) for frontend
- - s3 and dynamodb for state
- - http and websocket apis
- - low latency [logging](https://github.com/nathants/new-gocljs/tree/master/bin/logs.sh)
- - automated [devops](https://github.com/nathants/new-gocljs/tree/master/bin)
+a project scaffold for a fullstack webapp on aws with an [infrastructure set](https://github.com/nathants/new-gocljs/tree/master/infra.yaml) ready-to-deploy with [libaws](https://github.com/nathants/libaws).
+
+the project scaffold contains:
+ - a go lambda backend.
+ - a clojurescript and [react](http://reagent-project.github.io/) frontend.
+ - s3 and dynamodb for state.
+ - http and websocket apis.
+ - low latency [logging](https://github.com/nathants/new-gocljs/tree/master/bin/logs.sh).
+ - automated [devops](https://github.com/nathants/new-gocljs/tree/master/bin).
 
 a live demo on aws is [here](https://gocljs.nathants.com).
 
