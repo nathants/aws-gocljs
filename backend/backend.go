@@ -511,7 +511,8 @@ func handleRequest(ctx context.Context, event map[string]interface{}) (events.AP
 	} else if routeKey != "" {
 		lib.Logger.Println("websocket", r.StatusCode, routeKey, time.Since(start), sourceIP(event), timestamp())
 	} else if pathOk {
-		lib.Logger.Println("http", r.StatusCode, path, time.Since(start), sourceIP(event), timestamp())
+		method := event["httpMethod"]
+		lib.Logger.Println("http", r.StatusCode, method, path, time.Since(start), sourceIP(event), timestamp())
 	} else {
 		lib.Logger.Println("async", time.Since(start), timestamp())
 	}
