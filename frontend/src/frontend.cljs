@@ -184,9 +184,6 @@
    [mui-card {:style {:padding "20px"}}
     [:strong "keyboard shortcuts"]
     [:ul {:style {:padding-left "25px"}}
-     [:li "h : home"]
-     [:li "f : files"]
-     [:li "d : dms"]
      [:li "/ : search"]]]])
 
 (def search-ref (atom nil))
@@ -240,9 +237,6 @@
                                 (swap! state update-in [:search-text] str "/Enter"))
     (= "?" (event-key e))    (swap! state assoc :modal-open true)
     (#{"INPUT" "TEXTAREA"} (.-tagName js/document.activeElement)) nil
-    (= "h" (event-key e)) (navigate-to "/home")
-    (= "f" (event-key e)) (navigate-to "/files")
-    (= "d" (event-key e)) (navigate-to "/dms")
     (= "/" (event-key e)) (when-not (:search-focus @state)
                             (focus (query-selector @search-ref "input"))
                             (swap! state merge {:search-focus true})
