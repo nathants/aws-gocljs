@@ -199,7 +199,7 @@
      [component-menu-button "files" component-files  mui-folder]
      [component-menu-button "api" component-api mui-access-time]
      [component-menu-button "websocket" component-websocket mui-sms]
-     [mui-text-field {:placeholder "search"
+     [mui-text-field {:label "search"
                       :ref #(reset! search-ref %)
                       :id "search"
                       :autoComplete "off"
@@ -211,7 +211,9 @@
                       :on-focus #(swap! state assoc :search-focus true)
                       :on-blur #(swap! state assoc :search-focus false)
                       :on-change #(swap! state assoc :search-text (target-value %))
-                      :style {:margin-left "0px" :padding-right "20px" :padding-left "5px"}}]]]
+                      :style {:margin-right "20px"
+                              :margin-left "5px"
+                              :min-width "150px"}}]]]
    [mui-container {:id "content" :style {:padding 0 :margin-top "10px"}}
     [(:page @state)]]])
 
