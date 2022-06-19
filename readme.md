@@ -34,8 +34,27 @@ the lambda zip contains only 3 files:
 >> ls -lh | awk '{print $9, $5}' | column -t
 
 favicon.png    2.7K # favicon
-index.html.gz  296K # react spa
+index.html.gz  296K # web app
 main           15M  # go binary
+```
+
+the index.html.gz:
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+      <meta charset="utf-8">
+      <meta http-equiv="Content-Security-Policy" content="script-src 'sha256-${JS_SHA256}'">
+      <link rel="icon" href="/favicon.png">
+    </head>
+    <body>
+        <div id="app"></div>
+        <script type="text/javascript">
+          ${JS}
+        </script>
+    </body>
+</html>
 ```
 
 the lambda zip itself:
@@ -84,10 +103,10 @@ bash bin/logs.sh          # tail the logs
 bash bin/delete.sh        # delete aws infra
 ```
 
-if you have bad upload bandwidth:
+## usage with bad upload bandwidth:
 
 ```bash
-# bash bin/dev.sh                                                                  # this needs upload bandwidth
-bash bin/dev_frontend.sh                                                           # iterate on localhost frontend
-bash bin/relay.sh "bash -c 'cd aws-gocljs && ZIP_COMPRESSION=0 bash bin/quick.sh'" # iterate on backend via ec2 relay
+# bash bin/dev.sh         # this needs upload bandwidth
+bash bin/dev_frontend.sh  # iterate on localhost frontend
+bash bin/relay.sh         # iterate on backend via ec2 relay
 ```
