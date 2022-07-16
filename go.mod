@@ -3,12 +3,12 @@ module aws-gocljs
 go 1.17
 
 require (
-	github.com/aws/aws-lambda-go v1.32.0
-	github.com/aws/aws-sdk-go v1.44.32
+	github.com/aws/aws-lambda-go v1.32.1
+	github.com/aws/aws-sdk-go v1.44.56
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gofrs/uuid v4.2.0+incompatible
-	github.com/nathants/go-dynamolock v0.0.0-20220518065221-3e2eb9e893a9
-	github.com/nathants/libaws v0.0.0-20220610060449-75b0ca4652b5
+	github.com/nathants/go-dynamolock v0.0.0-20220620080142-b1e66ed28155
+	github.com/nathants/libaws v0.0.0-20220627080753-84ec77f8f205
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29 // indirect
+	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
