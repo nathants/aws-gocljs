@@ -19,7 +19,7 @@ lambda:
       - concurrency=0
       - memory=128
       - timeout=900
-      - logs-ttl-days=14
+      - logs-ttl-days=7
     trigger:
       - type: api
         attr:
