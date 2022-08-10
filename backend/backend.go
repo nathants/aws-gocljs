@@ -175,6 +175,7 @@ func handleApiEvent(ctx context.Context, event *events.APIGatewayProxyRequest, r
 			case http.MethodGet:
 				httpTimeGet(ctx, event, res)
 				return
+			default:
 			}
 		default:
 		}
