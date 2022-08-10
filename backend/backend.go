@@ -346,22 +346,19 @@ func websocketSender(ctx context.Context, res chan<- events.APIGatewayProxyRespo
 	startTime := time.Now()
 	table := os.Getenv("PROJECT_NAME")
 	lockId := "lock.sender"
-	lockUid := uuid.Must(uuid.NewV4()).String()
-	maxAge := time.Second * 30
-	heartbeatInterval := time.Second * 5
-	releaseLock, err := dynamolock.AcquireLock(
-		ctx,
-		table,
-		lockId,
-		lockUid,
-		maxAge,
-		heartbeatInterval,
-	)
+	maxAge := time.Second * 10
+	heartbeat := time.Second * 5
+	unlock, _, err := dynamolock.Lock(ctx, table, lockId, maxAge, heartbeat)
 	if err != nil {
 		// another sender is already running
 		return
 	}
-	defer releaseLock()
+	defer func() {
+		err := unlock(nil)
+		if err != nil {
+			panic(err)
+		}
+	}()
 	for {
 		// scan db for all open websockets
 		count := 0
