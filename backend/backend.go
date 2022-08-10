@@ -9,7 +9,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"mime"
 	"net/http"
 	"os"
@@ -50,11 +49,11 @@ func index() events.APIGatewayProxyResponse {
 	headers := map[string]string{
 		"Content-Type": "text/html; charset=UTF-8",
 	}
-	indexBytes, err := ioutil.ReadFile("frontend/public/index.html.gz")
+	indexBytes, err := os.ReadFile("frontend/public/index.html.gz")
 	if err == nil {
 		headers["Content-Encoding"] = "gzip"
 	} else {
-		indexBytes, err = ioutil.ReadFile("frontend/public/index.html")
+		indexBytes, err = os.ReadFile("frontend/public/index.html")
 		if err != nil {
 			panic(err)
 		}
@@ -68,7 +67,7 @@ func index() events.APIGatewayProxyResponse {
 }
 
 func static(path string) events.APIGatewayProxyResponse {
-	data, err := ioutil.ReadFile("frontend/public" + path)
+	data, err := os.ReadFile("frontend/public" + path)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
@@ -126,7 +125,7 @@ func httpVersionGet(_ context.Context, _ *events.APIGatewayProxyRequest, res cha
 		if info.IsDir() {
 			return nil
 		}
-		data, err := ioutil.ReadFile(file)
+		data, err := os.ReadFile(file)
 		if err != nil {
 			panic(err)
 		}
