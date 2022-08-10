@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "devDependencies": {
-    "shadow-cljs": "2.19.6"
+    "shadow-cljs": "2.19.8"
   },
   "dependencies": {
-    "@emotion/react": "11.9.3",
-    "@emotion/styled": "11.9.3",
+    "@emotion/react": "11.10.0",
+    "@emotion/styled": "11.10.0",
     "@mui/icons-material": "5.6.2",
     "@mui/material": "5.6.4",
     "localforage": "1.10.0",
