@@ -27,9 +27,6 @@ lambda:
       - type: websocket
         attr:
           - dns=${PROJECT_DOMAIN_WEBSOCKET}
-      - type: schedule
-        attr:
-          - rate(5 minutes)
     policy:
       - AWSLambdaBasicExecutionRole
     allow:
