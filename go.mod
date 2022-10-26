@@ -4,11 +4,11 @@ go 1.19
 
 require (
 	github.com/aws/aws-lambda-go v1.34.1
-	github.com/aws/aws-sdk-go v1.44.82
+	github.com/aws/aws-sdk-go v1.44.123
 	github.com/dustin/go-humanize v1.0.0
-	github.com/gofrs/uuid v4.2.0+incompatible
-	github.com/nathants/go-dynamolock v0.0.0-20220810060559-1cb05b8cac68
-	github.com/nathants/libaws v0.0.0-20220823063055-90700b1696e5
+	github.com/gofrs/uuid v4.3.0+incompatible
+	github.com/nathants/go-dynamolock v0.0.0-20220906090431-2ca0ddeec74a
+	github.com/nathants/libaws v0.0.0-20221026081441-beba4f257257
 )
 
 require (
@@ -20,10 +20,10 @@ require (
 	github.com/pkg/term v1.1.0 // indirect
 	github.com/r3labs/diff/v2 v2.15.1 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
-	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8 // indirect
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde // indirect
-	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
+	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
