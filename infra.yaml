@@ -31,6 +31,7 @@ lambda:
       - AWSLambdaBasicExecutionRole
     allow:
       - dynamodb:* arn:aws:dynamodb:${AWS_DEFAULT_REGION}:*:table/${PROJECT_NAME}
+      - s3:* arn:aws:s3:::${PROJECT_BUCKET}
       - s3:* arn:aws:s3:::${PROJECT_BUCKET}/*
       - execute-api:ManageConnections arn:aws:execute-api:${AWS_DEFAULT_REGION}:*:${WEBSOCKET_ID}/*/*/*
       - lambda:InvokeFunction arn:aws:lambda:*:*:function:${PROJECT_NAME}
