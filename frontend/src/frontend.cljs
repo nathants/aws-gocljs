@@ -3,25 +3,20 @@
   (:require [cljs-http.client :as http]
             [cljs.core.async :refer [<! >! chan timeout] :as a]
             [cljs.pprint :as pp]
+
             [reagent.dom :as reagent.dom]
             [reagent.core :as reagent]
             [bide.core :as bide]
             [garden.core :as garden]
             [clojure.string :as s]
             [haslett.client :as ws]
-            [reagent-mui.material.app-bar :refer [app-bar] :rename {app-bar mui-app-bar}]
-            [reagent-mui.material.card :refer [card] :rename {card mui-card}]
-            [reagent-mui.material.text-field :refer [text-field] :rename {text-field mui-text-field}]
-            [reagent-mui.material.container :refer [container] :rename {container mui-container}]
-            [reagent-mui.material.grid :refer [grid] :rename {grid mui-grid}]
-            [reagent-mui.material.linear-progress :refer [linear-progress] :rename {linear-progress mui-linear-progress}]
-            [reagent-mui.material.icon-button :refer [icon-button] :rename {icon-button mui-icon-button}]
-            [reagent-mui.material.toolbar :refer [toolbar] :rename {toolbar mui-toolbar}]
-            [reagent-mui.material.typography :refer [typography] :rename {typography mui-typography}]
-            [reagent-mui.icons.home :refer [home] :rename {home mui-home}]
-            [reagent-mui.icons.sms :refer [sms] :rename {sms mui-sms}]
-            [reagent-mui.icons.access-time :refer [access-time] :rename {access-time mui-access-time}]
-            [reagent-mui.icons.folder :refer [folder] :rename {folder mui-folder}]))
+
+            ["react" :as react]
+            ["@mui/material" :as mui]
+            ["@primer/octicons-react" :as octo]
+            [reagent.impl.template :as rtpl]))
+
+(def adapt reagent/adapt-react-class)
 
 (set! *warn-on-infer* true)
 
@@ -116,18 +111,20 @@
         :else (throw "failed after several tries")))))
 
 (defn component-home []
-  [mui-card card-style
-   [mui-typography "home"]])
+  [:> mui/Card card-style
+   [:> mui/Typography
+    "home"]])
 
 (defn component-files []
-  [mui-card card-style
-   [mui-typography "files"]])
+  [:> mui/Card card-style
+   [:> mui/Typography
+    "files"]])
 
 (defn component-search []
   [:<>
    (for [line (remove s/blank? (s/split (:search-text @state) #"/"))]
-     ^{:key (gen-id)} [mui-card card-style
-                       [mui-typography line]])])
+     ^{:key (gen-id)} [:> mui/Card card-style
+                       [:> mui/Typography line]])])
 
 (goog-define ws-domain "") ;; defined via environment variable PROJECT_DOMAIN_WEBSOCKET
 
@@ -137,81 +134,133 @@
           url (str "wss://" ws-domain)
           new-stream #(go (let [stream (<! (ws/connect url {}))]
                             (swap! state assoc :websocket-stream stream)
+                            (js/console.log "stream" stream)
                             stream))]
       (loop [stream (<! (new-stream))]
         (a/alt!
-          (:source stream) ([data] (let [val (js->clj (js/JSON.parse data) :keywordize-keys true)]
-                                     (swap! state assoc :websocket-time (:time val))
-                                     (when (= stream (:websocket-stream @state))
-                                       (recur stream))))
+          (:in stream) ([data] (let [val (js->clj (js/JSON.parse data) :keywordize-keys true)]
+                                 (swap! state assoc :websocket-time (:time val))
+                                 (when (= stream (:websocket-stream @state))
+                                   (recur stream))))
           (:close-status stream) ([close-status] (recur (<! (new-stream)))))))))
 
 (defn component-websocket []
-  [mui-card card-style
-   [mui-typography "time: " (:websocket-time @state)]])
+  [:> mui/Card card-style
+   [:> mui/Typography "time: " (:websocket-time @state)]])
 
 (defn component-api []
   (if (nil? (:time @state))
-    [mui-card card-style
-     [mui-linear-progress {:style {:height "13px" :margin "2px"}}]]
-    [mui-card card-style
-     [mui-typography (str "time: " (:time @state))]]))
+    [:> mui/Card card-style
+     [:> mui/LinearProgress {:style {:height "13px" :margin "2px"}}]]
+    [:> mui/Card card-style
+     [:> mui/Typography (str "time: " (:time @state))]]))
 
 (defn component-not-found []
   [:div
    [:p "404"]])
 
 (defn component-menu-button [page-name page-component icon]
-  [mui-icon-button {:id page-name
-                    :disable-ripple true
-                    :class "menu-button"
-                    :href (str "#/" page-name)
-                    :style  (merge {:padding "15px"}
-                                   (if (= page-component (:page @state))
-                                     {:color "red"}))}
-   [mui-grid
+  [:> mui/IconButton
+   {:id page-name
+    :disable-ripple true
+    :class "menu-button"
+    :href (str "#/" page-name)
+    :style  (merge {:padding "15px"}
+                   (if (= page-component (:page @state))
+                     {:color "red"}))}
+   [:> mui/Grid
     [icon]
-    [mui-typography {:style {:font-weight 700}} page-name]]])
+    [:> mui/Typography
+     {:style {:font-weight 700}}
+     page-name]]])
+
 
 (defn component-help []
-  [mui-grid {:spacing 0
-             :alignItems "center"
-             :justify "center"
-             :style {:display "flex"
-                     :flexDirection "column"
-                     :justifyContent "center"
-                     :minHeight "100vh"}}
-   [mui-card {:style {:padding "20px"}}
+  [:> mui/Grid {:spacing 0
+                :alignItems "center"
+                :justify "center"
+                :style {:display "flex"
+                        :flexDirection "column"
+                        :justifyContent "center"
+                        :minHeight "100vh"}}
+   [:> mui/Card {:style {:padding "20px"}}
     [:strong "keyboard shortcuts"]
     [:ul {:style {:padding-left "25px"}}
      [:li "/ : search"]]]])
 
 (def search-ref (atom nil))
 
+;; For some reason the new MUI doesn't pass ref in the props,
+;; but we can get it using forwardRef?
+;; This is someone incovenient as we need to convert props to Cljs
+;; but reactify-component would also do that.
+(def ^:private input-component
+  (react/forwardRef
+   (fn [props ref]
+     (reagent/as-element
+      [:input (-> (js->clj props :keywordize-keys true)
+                (assoc :ref ref))]))))
+
+(def ^:private textarea-component
+  (react/forwardRef
+   (fn [props ref]
+     (reagent/as-element
+      [:textarea (-> (js->clj props :keywordize-keys true)
+                   (assoc :ref ref))]))))
+
+;; To fix cursor jumping when controlled input value is changed,
+;; use wrapper input element created by Reagent instead of
+;; letting Material-UI to create input element directly using React.
+;; Create-element + convert-props-value is the same as what adapt-react-class does.
+(defn text-field [props & children]
+  (let [props (-> props
+                (assoc-in [:InputProps :inputComponent]
+                          (cond
+                            (and (:multiline props) (:rows props) (not (:maxRows props)))
+                            textarea-component
+
+                            ;; FIXME: Autosize multiline field is broken.
+                            (:multiline props)
+                            nil
+
+                            ;; Select doesn't require cursor fix so default can be used.
+                            (:select props)
+                            nil
+
+                            :else
+                            input-component))
+                ;; FIXME: Internal fn should not be used
+                ;; clj->js is not enough as prop on-change -> onChange, class -> classNames etc should be handled
+                rtpl/convert-prop-value)]
+    (apply reagent/create-element mui/TextField props (map reagent/as-element children))))
+
 (defn component-main []
   [:<>
-   [mui-app-bar {:position "relative"}
-    [mui-toolbar {:style {:padding 0}}
-     [component-menu-button "home" component-home  mui-home]
-     [component-menu-button "files" component-files  mui-folder]
-     [component-menu-button "api" component-api mui-access-time]
-     [component-menu-button "websocket" component-websocket mui-sms]
-     [mui-text-field {:label "search"
-                      :ref #(reset! search-ref %)
-                      :id "search"
-                      :autoComplete "off"
-                      :spellCheck false
-                      :multiline false
-                      :fullWidth true
-                      :focused (:search-focus @state)
-                      :value (:search-text @state)
-                      :on-focus #(swap! state assoc :search-focus true)
-                      :on-blur #(swap! state assoc :search-focus false)
-                      :on-change #(swap! state assoc :search-text (target-value %))
-                      :style {:margin-right "20px"
-                              :margin-left "5px"
-                              :min-width "150px"}}]]]
-   [mui-container {:id "content" :style {:padding 0 :margin-top "10px"}}
+   [:> mui/AppBar
+    {:position "relative"}
+    [:> mui/Toolbar
+     {:style {:padding 0}}
+     [component-menu-button "home" component-home (adapt octo/HomeIcon)]
+     [component-menu-button "files" component-files  (adapt octo/FileDirectoryIcon)]
+     [component-menu-button "api" component-api (adapt octo/GlobeIcon)]
+     [component-menu-button "websocket" component-home (adapt octo/ServerIcon)]
+     [text-field
+      {:label "search"
+       :ref #(reset! search-ref %)
+       :id "search"
+       :autoComplete "off"
+       :spellCheck false
+       :multiline false
+       :fullWidth true
+       :focused (:search-focus @state)
+       :value (:search-text @state)
+       :on-focus #(swap! state assoc :search-focus true)
+       :on-blur #(swap! state assoc :search-focus false)
+       :on-change #(swap! state assoc :search-text (target-value %))
+       :style {:margin-right "20px"
+               :margin-left "5px"
+               :min-width "150px"}}]]]
+   [:> mui/Container {:id "content" :style {:padding 0 :margin-top "10px"}}
     [(:page @state)]]])
 
 (defn component-root []
@@ -253,21 +302,18 @@
   (add-watch state key (fn [key atom old new]
                          (when (not= (get old key)
                                      (get new key))
-                           (f  (get new key))))))
+                           (f (get new key))))))
 
 (defwatch :search-text
   (fn [text]
-    (navigate-to (str "/search/" text))))
+    (navigate-to (str "/search/" ))))
 
 (defwatch :search-focus
   (fn [focus]
     (when (and focus (not (s/starts-with? (url) "/search/")))
-      (navigate-to (str "/search/" (:search-text @state))))))
+      (navigate-to "/search/"))))
 
 (defn on-navigate [component data]
-  (when (= component-search component)
-    (when-let [val (:0 data)]
-      (swap! state assoc :search-text (js/decodeURIComponent val))))
   (when (= component-api component)
     (swap! state assoc :time nil)
     (go (let [resp (<! (api-get "/api/time" {}))]

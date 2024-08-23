@@ -125,7 +125,8 @@ while true; do (
                 read -r file content <<< \"\$line\"
                 echo \$file
                 echo \$content | base64 -d > \$file
-                date +%s | sudo tee /etc/timeout.start.seconds >/dev/null || true # reset start time for: libaws ec2-new --seconds-timeout
+                date +%s > /tmp/seconds
+                sudo mv -f /tmp/seconds /etc/timeout.start.seconds
                 echo $remote_cmd
                 $remote_cmd
             done
