@@ -243,7 +243,7 @@
      [component-menu-button "home" component-home (adapt octo/HomeIcon)]
      [component-menu-button "files" component-files  (adapt octo/FileDirectoryIcon)]
      [component-menu-button "api" component-api (adapt octo/GlobeIcon)]
-     [component-menu-button "websocket" component-home (adapt octo/ServerIcon)]
+     [component-menu-button "websocket" component-websocket (adapt octo/ServerIcon)]
      [text-field
       {:label "search"
        :ref #(reset! search-ref %)
