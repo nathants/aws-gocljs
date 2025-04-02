@@ -1,4 +1,4 @@
-env.sh
+env*.sh
 frontend/public/index.html.gz
 frontend/public/js/
 frontend/node_modules/
