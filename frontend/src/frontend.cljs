@@ -41,15 +41,6 @@
 (defn prevent-default [^js/Event e]
   (.preventDefault e))
 
-(let [id (atom 0)
-      -gen-id (memoize
-               (fn [& args]
-                 (swap! id inc)))]
-  (defn gen-id [& args]
-    (if (zero? (count args))
-      (swap! id inc)
-      (apply -gen-id args))))
-
 (defonce state
   (reagent/atom
    {:modal-open false
@@ -123,8 +114,9 @@
 (defn component-search []
   [:<>
    (for [line (remove s/blank? (s/split (:search-text @state) #"/"))]
-     ^{:key (gen-id)} [:> mui/Card card-style
-                       [:> mui/Typography line]])])
+     ^{:key line}
+     [:> mui/Card card-style
+      [:> mui/Typography line]])])
 
 (goog-define ws-domain "") ;; defined via environment variable PROJECT_DOMAIN_WEBSOCKET
 
