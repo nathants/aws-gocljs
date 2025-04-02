@@ -163,7 +163,9 @@
    [:> mui/Grid
     [icon]
     [:> mui/Typography
-     {:style {:font-weight 700}}
+     {:style {:font-weight 700 :margin-top "3px"
+              :margin-bottom "5px"
+              }}
      page-name]]])
 
 
@@ -177,8 +179,9 @@
                         :minHeight "100vh"}}
    [:> mui/Card {:style {:padding "20px"}}
     [:strong "keyboard shortcuts"]
-    [:ul {:style {:padding-left "25px"}}
-     [:li "/ : search"]]]])
+    [:ul {:style {:padding-left "25px"
+                  :list-style-type :none                  }}
+     [:li "/ search"]]]])
 
 (def search-ref (atom nil))
 
@@ -252,7 +255,7 @@
        :style {:margin-right "20px"
                :margin-left "5px"
                :min-width "150px"}}]]]
-   [:> mui/Container {:id "content" :style {:padding 0 :margin-top "10px"}}
+   [:> mui/Container {:id "content" :max-width false :style {:padding 0 :margin-top "10px"}}
     [(:page @state)]]])
 
 (defn component-root []
