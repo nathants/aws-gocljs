@@ -204,7 +204,7 @@ func httpTimeGet(_ context.Context, _ *events.APIGatewayProxyRequest, res chan<-
 	}
 }
 
-func logRecover(r interface{}, res chan<- events.APIGatewayProxyResponse) {
+func logRecover(r any, res chan<- events.APIGatewayProxyResponse) {
 	stack := string(debug.Stack())
 	lib.Logger.Println(r)
 	lib.Logger.Println(stack)
@@ -295,8 +295,8 @@ func handleWebsocketEvent(ctx context.Context, event *events.APIGatewayWebsocket
 	}
 }
 
-func websocketRouteKey(event map[string]interface{}) string {
-	val, ok := event["requestContext"].(map[string]interface{})
+func websocketRouteKey(event map[string]any) string {
+	val, ok := event["requestContext"].(map[string]any)
 	if ok {
 		routeKey, ok := val["routeKey"].(string)
 		if ok {
@@ -306,8 +306,8 @@ func websocketRouteKey(event map[string]interface{}) string {
 	return ""
 }
 
-func websocketConnectionID(event map[string]interface{}) string {
-	val, ok := event["requestContext"].(map[string]interface{})
+func websocketConnectionID(event map[string]any) string {
+	val, ok := event["requestContext"].(map[string]any)
 	if ok {
 		connectionID, ok := val["connectionId"].(string)
 		if ok {
@@ -338,6 +338,10 @@ func invokeWebsocketSender() {
 	}
 }
 
+type Data struct {
+	Value string
+}
+
 func websocketSender(ctx context.Context, res chan<- events.APIGatewayProxyResponse) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -349,13 +353,13 @@ func websocketSender(ctx context.Context, res chan<- events.APIGatewayProxyRespo
 	lockId := "lock.sender"
 	maxAge := time.Second * 10
 	heartbeat := time.Second * 5
-	unlock, _, err := dynamolock.Lock(ctx, table, lockId, maxAge, heartbeat)
+	unlock, _, data, err := dynamolock.Lock[dynamolock.LockData](ctx, table, lockId, maxAge, heartbeat)
 	if err != nil {
 		// another sender is already running
 		return
 	}
 	defer func() {
-		err := unlock(nil)
+		err := unlock(data)
 		if err != nil {
 			panic(err)
 		}
@@ -436,7 +440,7 @@ func websocketSender(ctx context.Context, res chan<- events.APIGatewayProxyRespo
 	}
 }
 
-func handle(ctx context.Context, event map[string]interface{}, res chan<- events.APIGatewayProxyResponse) {
+func handle(ctx context.Context, event map[string]any, res chan<- events.APIGatewayProxyResponse) {
 	defer func() {
 		if r := recover(); r != nil {
 			logRecover(r, res)
@@ -476,10 +480,10 @@ func handle(ctx context.Context, event map[string]interface{}, res chan<- events
 	handleApiEvent(ctx, apiEvent, res)
 }
 
-func sourceIP(event map[string]interface{}) string {
-	req, ok := event["requestContext"].(map[string]interface{})
+func sourceIP(event map[string]any) string {
+	req, ok := event["requestContext"].(map[string]any)
 	if ok {
-		identity, ok := req["identity"].(map[string]interface{})
+		identity, ok := req["identity"].(map[string]any)
 		if ok {
 			sourceIP, ok := identity["sourceIp"].(string)
 			if ok {
@@ -494,7 +498,7 @@ func timestamp() string {
 	return time.Now().UTC().Format(time.RFC3339)
 }
 
-func handleRequest(ctx context.Context, event map[string]interface{}) (events.APIGatewayProxyResponse, error) {
+func handleRequest(ctx context.Context, event map[string]any) (events.APIGatewayProxyResponse, error) {
 	setupLogging(ctx)
 	defer lib.Logger.Flush()
 	start := time.Now()
@@ -522,7 +526,7 @@ func setupLogging(ctx context.Context) {
 	uid := uuid.Must(uuid.NewV4()).String()
 	count := 0
 	lib.Logger = &lib.LoggerStruct{
-		Print: func(args ...interface{}) {
+		Print: func(args ...any) {
 			lock.Lock()
 			defer lock.Unlock()
 			lines = append(lines, fmt.Sprint(args...))
