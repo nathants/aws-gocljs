@@ -102,11 +102,3 @@ bash bin/dev.sh           # iterate on backend and frontend
 bash bin/logs.sh          # tail the logs
 bash bin/delete.sh        # delete aws infra
 ```
-
-## usage with bad upload bandwidth:
-
-```bash
-# bash bin/dev.sh         # this needs upload bandwidth
-bash bin/dev_frontend.sh  # iterate on localhost frontend
-bash bin/relay.sh         # iterate on backend via ec2 relay
-```
