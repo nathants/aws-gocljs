@@ -6,7 +6,7 @@ fullstack web should be easy and fun.
 
 ## how
 
-start with working implementations of everything, then [tinker and tweak](#sdlc-demo) until your app is complete!
+start with working implementations of everything, then [iterate](#sdlc-demo)!
 
 fast and reliable [automation](https://github.com/nathants/aws-gocljs/tree/master/bin).
 
