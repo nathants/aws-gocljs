@@ -1,6 +1,6 @@
 module aws-gocljs
 
-go 1.23.0
+go 1.24
 
 toolchain go1.24.1
 
@@ -10,7 +10,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/nathants/go-dynamolock v0.0.0-20250221024044-d2e4b08f5b75
-	github.com/nathants/libaws v0.0.0-20250402051440-7de3598c8846
+	github.com/nathants/libaws v0.0.0-20250403044500-6a01a31e6116
 )
 
 require (
