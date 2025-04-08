@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eou pipefail
 
-source env.sh
+source ${1:-env.sh}
 
 touch frontend/public/index.html.gz
 touch frontend/public/favicon.png
