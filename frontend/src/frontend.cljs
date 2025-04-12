@@ -229,6 +229,56 @@
                 rtpl/convert-prop-value)]
     (apply reagent/create-element mui/TextField props (map reagent/as-element children))))
 
+(defn component-form []
+  [:<>
+   [:> mui/Card card-style
+    [text-field
+     {:label "enter your data"
+      :id "data"
+      :variant :outlined
+      :full-width true
+      :focused (:data-focus @state)
+      :value (:data-text @state)
+      :on-focus #(swap! state assoc :data-focus true)
+      :on-blur #(swap! state assoc :data-focus false)
+      :on-change #(swap! state assoc :data-text (target-value %))
+      :style {:margin-bottom "20px"
+              :min-width "150px"}}]
+    [text-field
+     {:label "enter more of your data"
+      :id "more-data"
+      :full-width true
+      :variant :outlined
+      :focused (:more-data-focus @state)
+      :value (:more-data-text @state)
+      :on-focus #(swap! state assoc :more-data-focus true)
+      :on-blur #(swap! state assoc :more-data-focus false)
+      :on-change #(swap! state assoc :more-data-text (target-value %))
+      :style {:margin-bottom "20px"
+              :min-width "150px"}}]
+    [:> mui/Button {:full-width true
+                    :variant :contained
+                    :on-click #(do (swap! state merge {:form-progress true
+                                                       :form-resp nil})
+                                   (go (let [req {:data (:data-text @state)
+                                                  :more-data (:more-data-text @state)}
+                                             resp (<! (api-post "/api/data" req))]
+                                         (swap! state merge {:form-progress nil
+                                                             :form-resp resp}))))
+                    :style {:background-color :grey}}
+     "submit"]]
+   (when (:form-progress @state)
+     [:> mui/Card card-style
+      [:> mui/LinearProgress
+       {:style {:width "100%"
+                :height "20px"}}]])
+   (when-let [resp (:form-resp @state)]
+     [:> mui/Card card-style
+      [:> mui/Typography
+       (str "status: " (:status resp))]
+      [:> mui/Typography {:style {:margin-top "10px"}}
+       (str "message: " (:message (:body resp)))]])])
+
 (defn component-main []
   [:<>
    [:> mui/AppBar
@@ -238,15 +288,14 @@
      [component-menu-button "home" component-home (adapt octo/HomeIcon)]
      [component-menu-button "files" component-files  (adapt octo/FileDirectoryIcon)]
      [component-menu-button "api" component-api (adapt octo/GlobeIcon)]
+     [component-menu-button "form" component-form (adapt octo/DatabaseIcon)]
      [component-menu-button "websocket" component-websocket (adapt octo/ServerIcon)]
      [text-field
       {:label "search"
        :ref #(reset! search-ref %)
+       :variant :outlined
        :id "search"
-       :autoComplete "off"
-       :spellCheck false
-       :multiline false
-       :fullWidth true
+       :full-width true
        :focused (:search-focus @state)
        :value (:search-text @state)
        :on-focus #(swap! state assoc :search-focus true)
@@ -329,6 +378,7 @@
    ["/search/(.*)" component-search]
    ["/websocket" component-websocket]
    ["/api" component-api]
+   ["/form" component-form]
    ["(.*)" component-not-found]])
 
 (defn start-router []

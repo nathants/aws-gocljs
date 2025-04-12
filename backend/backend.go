@@ -175,20 +175,49 @@ func handleApiEvent(ctx context.Context, event *events.APIGatewayProxyRequest, r
 			}
 			return
 		}
-		switch event.Path {
-		case "/api/time":
-			switch event.HTTPMethod {
-			case http.MethodGet:
-				httpTimeGet(ctx, event, res)
-				return
-			default:
-			}
-		default:
+		if event.Path == "/api/time" && event.HTTPMethod == http.MethodGet {
+			httpTimeGet(ctx, event, res)
+			return
+		} else if event.Path == "/api/data" && event.HTTPMethod == http.MethodPost {
+			httpDataPost(ctx, event, res)
+			return
 		}
 		res <- notfound()
 		return
 	}
 	res <- notfound()
+}
+
+type dataPostRequest struct {
+	Data     string `json:"data"`
+	MoreData string `json:"more-data"`
+}
+
+type dataPostResponse struct {
+	Message string `json:"message"`
+}
+
+func httpDataPost(_ context.Context, req *events.APIGatewayProxyRequest, res chan<- events.APIGatewayProxyResponse) {
+	input := dataPostRequest{}
+	err := json.Unmarshal([]byte(req.Body), &input)
+	if err != nil {
+		panic(err)
+	}
+	output := dataPostResponse{
+		Message: fmt.Sprintln("thanks for", input.Data, "and", input.MoreData),
+	}
+	data, err := json.Marshal(output)
+	if err != nil {
+	    panic(err)
+	}
+	time.Sleep(1*time.Second) // so we can see the linear-progress on the frontend
+	res <- events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Body:       string(data),
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
+	}
 }
 
 type timeGetReponse struct {
