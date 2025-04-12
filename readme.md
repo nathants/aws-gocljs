@@ -2,15 +2,17 @@
 
 ## why
 
-fullstack web should be easy and fun.
+just ship fullstack web on aws
 
 ## how
 
-start with working implementations of everything, then [iterate](#sdlc-demo)!
+start with working implementations of everything, then [iterate](#sdlc-demo).
 
 fast and reliable [automation](https://github.com/nathants/aws-gocljs/tree/master/bin).
 
 easy browser [testing](https://github.com/nathants/py-webengine).
+
+the tightest possible security [policy](https://github.com/nathants/aws-gocljs/blob/master/bin/ensure.sh), no other js can ever run.
 
 ## what
 
