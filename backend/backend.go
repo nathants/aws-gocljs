@@ -49,7 +49,11 @@ type Websocket struct {
 
 func index() events.APIGatewayProxyResponse {
 	headers := map[string]string{
-		"Content-Type": "text/html; charset=UTF-8",
+		"Content-Type":              "text/html; charset=UTF-8",
+		"Content-Security-Policy":   "frame-ancestors 'none'; object-src 'none';",
+		"X-Content-Type-Options":    "nosniff",
+		"Strict-Transport-Security": "max-age=31536000; includeSubDomains;",
+		"Referrer-Policy":           "strict-origin",
 	}
 	indexBytes, err := os.ReadFile("frontend/public/index.html.gz")
 	if err == nil {
