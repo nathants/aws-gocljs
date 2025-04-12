@@ -2,11 +2,11 @@
 
 ## why
 
-just ship fullstack web on aws
+so you can just ship fullstack web on aws.
 
 ## how
 
-start with working implementations of everything, then [iterate](#sdlc-demo).
+start with working implementations of everything, then [iterate](#demo).
 
 fast and reliable [automation](https://github.com/nathants/aws-gocljs/tree/master/bin).
 
@@ -20,13 +20,13 @@ a project scaffold for a fullstack webapp on aws with an [infrastructure set](ht
 
 the project scaffold contains:
  - a go lambda backend.
- - a clojurescript and [react](http://reagent-project.github.io/) frontend.
+ - a clojurescript [react](http://reagent-project.github.io/) frontend.
  - s3 and dynamodb for state.
  - http and websocket apis.
- - low latency [logging](https://github.com/nathants/aws-gocljs/tree/master/bin/logs.sh).
- - automated [devops](https://github.com/nathants/aws-gocljs/tree/master/bin).
+ - [logging](https://github.com/nathants/aws-gocljs/tree/master/bin/logs.sh).
+ - [devops](https://github.com/nathants/aws-gocljs/tree/master/bin).
 
-a live demo on aws is [here](https://gocljs.nathants.com).
+a live demo is [here](https://gocljs.nathants.com).
 
 ## lambda zip
 
@@ -66,7 +66,7 @@ the lambda zip itself:
 lambda.zip 4.6M
 ```
 
-## sdlc demo
+## demo
 
 ![](https://github.com/nathants/aws-gocljs/raw/master/demo.gif)
 
