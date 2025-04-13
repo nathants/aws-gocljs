@@ -4,6 +4,8 @@
 
 so you can just ship fullstack web on aws.
 
+![](https://github.com/nathants/aws-gocljs/raw/master/screenshot.png)
+
 ## how
 
 start with working implementations of everything, then [iterate](#demo).
