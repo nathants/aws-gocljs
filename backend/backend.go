@@ -232,6 +232,7 @@ func httpTimeGet(_ context.Context, _ *events.APIGatewayProxyRequest, res chan<-
 	if err != nil {
 		panic(err)
 	}
+	time.Sleep(1*time.Second)
 	res <- events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       string(data),

@@ -5,16 +5,16 @@ go 1.24
 toolchain go1.24.1
 
 require (
-	github.com/aws/aws-lambda-go v1.47.0
+	github.com/aws/aws-lambda-go v1.48.0
 	github.com/aws/aws-sdk-go-v2 v1.36.3
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.18.9
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.42.1
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.71.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.1
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.18.12
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.42.4
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.71.2
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.2
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/nathants/go-dynamolock v0.0.0-20250408020506-f5ebde6a52d4
-	github.com/nathants/libaws v0.0.0-20250407100805-9b4ba3cb5975
+	github.com/nathants/go-dynamolock v0.0.0-20250409081145-4131e1e4f1e8
+	github.com/nathants/libaws v0.0.0-20250412062845-cfd1a2575af2
 )
 
 require (
@@ -35,7 +35,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.47.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/codecommit v1.28.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.48.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.25.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.25.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.211.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.43.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.54.5 // indirect
