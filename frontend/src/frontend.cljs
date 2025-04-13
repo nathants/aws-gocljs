@@ -230,7 +230,7 @@
            [:> mui/Box
             {:style {:border "1px solid #d0d7de"
                      :borderRadius "6px"
-                     :marginTop "10px"
+                     :marginTop "0"
                      :overflow "hidden"}}
             [:div
              {:style {:padding "8px"
@@ -318,7 +318,7 @@
            [:> mui/Box
             {:style {:border "1px solid #d0d7de"
                      :borderRadius "6px"
-                     :marginTop "10px"
+                     :marginTop "0"
                      :overflow "hidden"
                      :overflowX "auto"}}
             [:div
@@ -369,7 +369,7 @@
        [:> mui/Box
         {:style {:border "1px solid #d0d7de"
                  :borderRadius "6px"
-                 :marginTop "10px"
+                 :marginTop "0"
                  :overflow "hidden"}}
         [:div
          {:style {:padding "8px"
