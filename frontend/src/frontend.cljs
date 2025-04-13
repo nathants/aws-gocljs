@@ -229,21 +229,21 @@
           [:> mui/Card card-style
            [:> mui/Box
             {:style {:border "1px solid #d0d7de"
-                     :borderRadius "6px"
-                     :marginTop "0"
+                     :border-radius "6px"
+                     :margin-top "0"
                      :overflow "hidden"}}
             [:div
              {:style {:padding "8px"
-                      :borderBottom "1px solid #d0d7de"
+                      :border-bottom "1px solid #d0d7de"
                       :display "flex"}}
              [:div
               [:a
                {:href "#/files"
-                :style {:marginLeft "6px"
+                :style {:margin-left "6px"
                         :color "rgb(50,50,50)"
-                        :textDecoration "none"
+                        :text-decoration "none"
                         :display "inline-flex"
-                        :alignItems "center"
+                        :align-items "center"
                         :cursor "pointer"}}
                "repo"]
               (when subpath
@@ -258,55 +258,55 @@
                           " / "
                           [:a
                            {:href (str "#/files/" (s/join "/" (take (inc idx) crumb-parts)))
-                            :style {:marginLeft "3px"
+                            :style {:margin-left "3px"
                                     :color "rgb(50,50,50)"
-                                    :textDecoration "none"
+                                    :text-decoration "none"
                                     :display "inline-flex"
-                                    :alignItems "center"
+                                    :align-items "center"
                                     :cursor "pointer"}}
                            c]]
                          [:<>
                           " / "
                           [:span
-                           {:style {:marginLeft "3px"
+                           {:style {:margin-left "3px"
                                     :display "inline-flex"
-                                    :alignItems "center"}}
+                                    :align-items "center"}}
                            c]]))
                      crumb-parts))]))]]
             (for [row sub-files]
               ^{:key (:id row)}
               [:div
                {:style {:padding "8px"
-                        :borderBottom "1px solid #d0d7de"
+                        :border-bottom "1px solid #d0d7de"
                         :display "flex"
-                        :&:hover {:backgroundColor "#f6f8fa"}}}
+                        :&:hover {:background-color "#f6f8fa"}}}
                [:div
                 {:style {:flex "1"
                          :display "flex"
-                         :alignItems "center"}}
+                         :align-items "center"}}
                 (if (s/ends-with? (:name row) "/")
                   [:> octo/FileDirectoryFillIcon {:style {:color "#57606a"}}]
                   [:> octo/FileIcon {:style {:color "#57606a"}}])
                 [:a
                  {:href (str "#/files/" subpath "/" (:name row))
-                  :style {:marginLeft "6px"
+                  :style {:margin-left "6px"
                           :color "rgb(50,50,50)"
-                          :textDecoration "none"
+                          :text-decoration "none"
                           :display "inline-flex"
-                          :alignItems "center"
+                          :align-items "center"
                           :cursor "pointer"}}
                  [:> mui/Typography (:name row)]]]
                [:div
                 {:style {:flex "1"
                          :display "flex"
-                         :justifyContent "center"
-                         :alignItems "center"}}
+                         :justify-content "center"
+                         :align-items "center"}}
                 [:> mui/Typography (str (:size row) " bytes")]]
                [:div
                 {:style {:flex "1"
                          :display "flex"
-                         :justifyContent "flex-end"
-                         :alignItems "center"}}
+                         :justify-content "flex-end"
+                         :align-items "center"}}
                 [:> mui/Typography (:modified row)]]])]])
         (let [raw-contents (get files-contents (last (s/split subpath #"/"))
                                 ["No content found."])
@@ -317,22 +317,22 @@
           [:> mui/Card card-style
            [:> mui/Box
             {:style {:border "1px solid #d0d7de"
-                     :borderRadius "6px"
-                     :marginTop "0"
+                     :border-radius "6px"
+                     :margin-top "0"
                      :overflow "hidden"
-                     :overflowX "auto"}}
+                     :overflow-x "auto"}}
             [:div
              {:style {:padding "8px"
-                      :borderBottom "1px solid #d0d7de"
+                      :border-bottom "1px solid #d0d7de"
                       :display "flex"}}
              [:div
               [:a
                {:href "#/files"
-                :style {:marginLeft "6px"
+                :style {:margin-left "6px"
                         :color "rgb(50,50,50)"
-                        :textDecoration "none"
+                        :text-decoration "none"
                         :display "inline-flex"
-                        :alignItems "center"
+                        :align-items "center"
                         :cursor "pointer"}}
                "repo"]
               (when subpath
@@ -348,77 +348,77 @@
                           " / "
                           [:a
                            {:href (str "#/files/" (s/join "/" (take (inc idx) crumb-parts)))
-                            :style {:marginLeft "3px"
+                            :style {:margin-left "3px"
                                     :color "rgb(50,50,50)"
-                                    :textDecoration "none"
+                                    :text-decoration "none"
                                     :display "inline-flex"
-                                    :alignItems "center"
+                                    :align-items "center"
                                     :cursor "pointer"}}
                            c]]
                          ^{:key idx}
                          [:<>
                           " / "
                           [:span
-                           {:style {:marginLeft "3px"
+                           {:style {:margin-left "3px"
                                     :display "inline-flex"
-                                    :alignItems "center"}}
+                                    :align-items "center"}}
                            c]]))
                      crumb-parts))]))]]
             [component-file-content file]]]))
       [:> mui/Card card-style
        [:> mui/Box
         {:style {:border "1px solid #d0d7de"
-                 :borderRadius "6px"
-                 :marginTop "0"
+                 :border-radius "6px"
+                 :margin-top "0"
                  :overflow "hidden"}}
         [:div
          {:style {:padding "8px"
-                  :borderBottom "1px solid #d0d7de"
+                  :border-bottom "1px solid #d0d7de"
                   :display "flex"}}
          [:div
           [:a
            {:href "#/files"
-            :style {:marginLeft "6px"
-                    :textDecoration "none"
+            :style {:margin-left "6px"
+                    :text-decoration "none"
                     :color "rgb(50,50,50)"
                     :display "inline-flex"
-                    :alignItems "center"
+                    :align-items "center"
                     :cursor "pointer"}}
            "repo"]]]
         (for [row files-rows]
           ^{:key (:id row)}
           [:div
            {:style {:padding "8px"
-                    :borderBottom "1px solid #d0d7de"
+                    :border-bottom "1px solid #d0d7de"
                     :display "flex"
-                    :&:hover {:backgroundColor "#f6f8fa"}}}
+                    :&:hover {:background-color "#f6f8fa"}}}
            [:div
             {:style {:flex "1"
                      :display "flex"
-                     :alignItems "center"}}
+                     :align-items "center"}}
             (if (s/ends-with? (:name row) "/")
               [:> octo/FileDirectoryFillIcon {:style {:color "#57606a"}}]
               [:> octo/FileIcon {:style {:color "#57606a"}}])
             [:a
              {:href (str "#/files/" (:name row))
-              :style {:marginLeft "6px"
+              :style {:margin-left "6px"
                       :color "rgb(50,50,50)"
-                      :textDecoration "none"
+                      :text-decoration "none"
                       :display "inline-flex"
-                      :alignItems "center"
+                      :align-items "center"
                       :cursor "pointer"}}
              [:> mui/Typography (:name row)]]]
            [:div
             {:style {:flex "1"
                      :display "flex"
-                     :justifyContent "center"
-                     :alignItems "center"}}
+                     :justify-content "center"
+                     :align-items "center"}}
             [:> mui/Typography (str (:size row) " bytes")]]
            [:div
             {:style {:flex "1"
                      :display "flex"
-                     :justifyContent "flex-end"
-                     :alignItems "center"}}
+                     :justify-content "flex-end"
+                     :align-items "center"}}
             [:> mui/Typography (:modified row)]]])]])))
 
 (defn component-search []
@@ -496,8 +496,8 @@
      (if drawer?
        [:> mui/Grid
         {:style {:display "flex"
-                 :alignItems "center"
-                 :justifyContent "flex-start"}}
+                 :align-items "center"
+                 :justify-content "flex-start"}}
         [icon]
         [:> mui/Typography
          {:style {:font-weight 700
@@ -508,7 +508,7 @@
        [:> mui/Grid
         {:style {:display "flex"
                  :flex-direction "column"
-                 :alignItems "center"}}
+                 :align-items "center"}}
         [icon]
         [:> mui/Typography
          {:style {:font-weight 700
@@ -518,12 +518,12 @@
 
 (defn component-help []
   [:> mui/Grid {:spacing 0
-                :alignItems "center"
+                :align-items "center"
                 :justify "center"
                 :style {:display "flex"
-                        :flexDirection "column"
-                        :justifyContent "center"
-                        :minHeight "100vh"}}
+                        :flex-direction "column"
+                        :justify-content "center"
+                        :min-height "100vh"}}
    [:> mui/Card {:style {:padding "20px"}}
     [:strong "keyboard shortcuts"]
     [:ul {:style {:padding-left "25px"
@@ -630,14 +630,14 @@
   [:> mui/Drawer
    {:anchor "left"
     :open (:drawer-open @state)
-    :onClose #(swap! state assoc :drawer-open false)}
+    :on-close #(swap! state assoc :drawer-open false)}
    [:> mui/Box
     {:style {:width "100%" :height "100%"}
-     :onClick (fn [e]
-                (when (identical? (.-target e) (.-currentTarget e))
-                  (swap! state assoc :drawer-open false)))}
+     :on-click (fn [e]
+                 (when (identical? (.-target e) (.-currentTarget e))
+                   (swap! state assoc :drawer-open false)))}
     [:> mui/List
-     {:disablePadding true
+     {:disable-padding true
       :style {:padding 0}}
      [:> mui/ListItem {:style {:margin-top "20px"}}
       [component-menu-button "home" component-home (adapt octo/HomeIcon) :drawer? true]]
@@ -658,13 +658,12 @@
             :padding-bottom "13px"}
     :on-click #(swap! state update :drawer-open not)}
    [:> mui/Grid
-    {:style {:display "flex" :flex-direction "column" :alignItems "center"}}
+    {:style {:display "flex" :flex-direction "column" :align-items "center"}}
     [(adapt octo/ThreeBarsIcon)]
     [:> mui/Typography
      {:style {:font-weight 700
               :margin-top "0px"
-              :margin-bottom "0px"
-              }}
+              :margin-bottom "0px"}}
      "menu"]]])
 
 (defn component-main []
