@@ -1,38 +1,38 @@
-# aws-gocljs
+# AWS-GOCLJS
 
-## why
+## Why
 
-so you can just ship fullstack web on aws.
+So you can just ship fullstack web on AWS.
 
 ![](https://github.com/nathants/aws-gocljs/raw/master/screenshot.png)
 
-## how
+## How
 
-start with working implementations of everything, then [iterate](#demo).
+Start with working implementations of everything, then [iterate](#demo).
 
-fast and reliable [automation](https://github.com/nathants/aws-gocljs/tree/master/bin).
+Fast and reliable [automation](https://github.com/nathants/aws-gocljs/tree/master/bin).
 
-easy browser [testing](https://github.com/nathants/py-webengine).
+Easy browser [testing](https://github.com/nathants/py-webengine).
 
-the tightest possible security [policy](https://github.com/nathants/aws-gocljs/blob/master/bin/ensure.sh), no other js can ever run.
+The tightest possible security [policy](https://github.com/nathants/aws-gocljs/blob/master/bin/ensure.sh), no other JS can ever run.
 
-## what
+## What
 
-a project scaffold for a fullstack webapp on aws with an [infrastructure set](https://github.com/nathants/aws-gocljs/tree/master/infra.yaml) ready-to-deploy with [libaws](https://github.com/nathants/libaws).
+A project scaffold for a fullstack webapp on AWS with an [infrastructure set](https://github.com/nathants/aws-gocljs/tree/master/infra.yaml) ready-to-deploy with [libaws](https://github.com/nathants/libaws).
 
-the project scaffold contains:
- - a go lambda backend.
- - a clojurescript [react](http://reagent-project.github.io/) frontend.
- - s3 and dynamodb for state.
- - http and websocket apis.
- - [logging](https://github.com/nathants/aws-gocljs/tree/master/bin/logs.sh).
- - [devops](https://github.com/nathants/aws-gocljs/tree/master/bin).
+The project scaffold contains:
+ - A Go Lambda backend.
+ - A ClojureScript [React](http://reagent-project.github.io/) frontend.
+ - S3 and DynamoDB for state.
+ - HTTP and WebSocket APIs.
+ - [Logging](https://github.com/nathants/aws-gocljs/tree/master/bin/logs.sh).
+ - [DevOps](https://github.com/nathants/aws-gocljs/tree/master/bin).
 
-a live demo is [here](https://gocljs.nathants.com).
+A live demo is [here](https://gocljs.nathants.com).
 
-## lambda zip
+## Lambda Zip
 
-the lambda zip contains only 3 files:
+The Lambda zip contains only 3 files:
 
 ```bash
 >> ls -lh | awk '{print $9, $5}' | column -t
@@ -42,7 +42,7 @@ index.html.gz  296K # web app
 main           15M  # go binary
 ```
 
-the index.html.gz:
+The index.html.gz:
 
 ```html
 <!DOCTYPE html>
@@ -61,20 +61,20 @@ the index.html.gz:
 </html>
 ```
 
-the lambda zip itself:
+The lambda zip itself:
 
 ```bash
 >> ls -lh | awk '{print $9, $5}'
 lambda.zip 4.6M
 ```
 
-## demo
+## Demo
 
 ![](https://github.com/nathants/aws-gocljs/raw/master/demo.gif)
 
-## dependencies
+## Dependencies
 
-use the included [Dockerfile](./Dockerfile) or install the following dependencies:
+Use the included [Dockerfile](./Dockerfile) or install the following dependencies:
 - npm
 - jdk
 - go
@@ -82,13 +82,13 @@ use the included [Dockerfile](./Dockerfile) or install the following dependencie
 - [entr](https://formulae.brew.sh/formula/entr)
 - [libaws](https://github.com/nathants/libaws)
 
-## aws prerequisites
+## AWS Prerequisites
 
-- aws [route53](https://console.aws.amazon.com/route53/v2/hostedzones) has the domain or its parent from env.sh
+- AWS [Route53](https://console.aws.amazon.com/route53/v2/hostedzones) has the domain or its parent from env.sh
 
-- aws [acm](https://us-west-2.console.aws.amazon.com/acm/home) has a wildcard cert for the domain or its parent from env.sh
+- AWS [Acm](https://us-west-2.console.aws.amazon.com/acm/home) has a wildcard cert for the domain or its parent from env.sh
 
-## install
+## Install
 
 ```bash
 git clone https://github.com/nathants/aws-gocljs
@@ -96,7 +96,7 @@ cd aws-gocljs
 cp env.sh.template env.sh # update values
 ```
 
-## usage
+## Usage
 
 ```bash
 bash bin/check.sh         # lint
