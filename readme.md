@@ -75,7 +75,7 @@ lambda.zip 4.6M
 ## Dependencies
 
 Use the included [Dockerfile](./Dockerfile) or install the following dependencies:
-- npm
+- pnpm
 - jdk
 - go
 - bash
